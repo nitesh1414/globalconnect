@@ -1,0 +1,38 @@
+
+<svg width="400" height="100" viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGlobeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ca8a04"/>
+      <stop offset="50%" stop-color="#eab308"/>
+      <stop offset="100%" stop-color="#facc15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Globe Icon Symbol -->
+  <g transform="translate(10, 10)">
+    <!-- Globe sphere -->
+    <circle cx="40" cy="40" r="36" fill="url(#logoGlobeGrad)" stroke="#0c4a6e" stroke-width="2"/>
+    
+    <!-- Longitude / Latitude orbital lines -->
+    <ellipse cx="40" cy="40" rx="36" ry="14" fill="none" stroke="#38bdf8" stroke-width="1.8" opacity="0.8"/>
+    <ellipse cx="40" cy="40" rx="14" ry="36" fill="none" stroke="#38bdf8" stroke-width="1.8" opacity="0.8"/>
+    <line x1="4" y1="40" x2="76" y2="40" stroke="#38bdf8" stroke-width="1.8" opacity="0.8"/>
+    <line x1="40" y1="4" x2="40" y2="76" stroke="#38bdf8" stroke-width="1.8" opacity="0.8"/>
+
+    <!-- Orbital Gold Dynamic Ring -->
+    <path d="M 12,62 Q 40,15 68,18 Q 72,40 50,65 Q 25,75 12,62 Z" fill="none" stroke="url(#logoGold)" stroke-width="3.5"/>
+    
+    <!-- Connectivity Nodes -->
+    <circle cx="28" cy="28" r="4.5" fill="#facc15" stroke="#713f12" stroke-width="1.2"/>
+    <circle cx="54" cy="48" r="4.5" fill="#facc15" stroke="#713f12" stroke-width="1.2"/>
+    <line x1="28" y1="28" x2="54" y2="48" stroke="#facc15" stroke-width="2" stroke-dasharray="2 2"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="100" y="48" font-family="'Montserrat', 'Segoe UI', Arial, sans-serif" font-size="28" font-weight="900" fill="#0b2545" letter-spacing="2.5">GLOBAL<tspan fill="#ca8a04">CONNECT</tspan></text>
+  <text x="102" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11.5" font-weight="700" fill="#475569" letter-spacing="3.8">SINGAPORE • INDIA • GLOBAL TRADE</text>
+</svg>
