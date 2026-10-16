@@ -13,9 +13,9 @@ $currentUser = current_user();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?></title>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo.svg">
-    <link rel="stylesheet" href="/assets/css/admin.css">
-    <link rel="stylesheet" href="/assets/css/editor.css">
+    <link rel="icon" type="image/svg+xml" href="<?= image_url('logo.svg') ?>">
+    <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
+    <link rel="stylesheet" href="<?= asset('css/editor.css') ?>">
 </head>
 <body class="admin-body">
 
@@ -31,7 +31,7 @@ $currentUser = current_user();
             </div>
 
             <div class="topbar-right">
-                <a href="/index.php" target="_blank" class="btn-view-site">
+                <a href="<?= url('index.php') ?>" target="_blank" class="btn-view-site">
                     <span>↗</span> View Public Website
                 </a>
 

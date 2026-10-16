@@ -5,7 +5,7 @@
 require_once __DIR__ . '/../includes/functions.php';
 
 if (is_logged_in()) {
-    header('Location: /admin/index.php');
+    header('Location: ' . admin_url('index.php'));
     exit;
 }
 
@@ -21,26 +21,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($username) || empty($password)) {
             $errorMsg = 'Please enter both username and password.';
         } else {
-            $db = get_db();
-            $stmt = $db->prepare("SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1");
-            $stmt->execute([$username, $username]);
-            $user = $stmt->fetch();
+            try {
+                $db = get_db();
+                $stmt = $db->prepare("SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1");
+                $stmt->execute([$username, $username]);
+                $user = $stmt->fetch();
 
-            if ($user && (password_verify($password, $user['password']) || ($username === 'admin' && $password === 'admin123'))) {
-                // If matched default pass, rehash
-                if ($username === 'admin' && $password === 'admin123' && !password_verify($password, $user['password'])) {
-                    $newHash = password_hash('admin123', PASSWORD_BCRYPT);
-                    $update = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
-                    $update->execute([$newHash, $user['id']]);
+                if ($user && (password_verify($password, $user['password']) || ($username === 'admin' && $password === 'admin123'))) {
+                    if ($username === 'admin' && $password === 'admin123' && !password_verify($password, $user['password'])) {
+                        $newHash = password_hash('admin123', PASSWORD_BCRYPT);
+                        $update = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
+                        $update->execute([$newHash, $user['id']]);
+                    }
+
+                    $_SESSION['admin_user_id'] = $user['id'];
+                    $_SESSION['admin_username'] = $user['username'];
+                    set_flash('success', 'Welcome back, ' . $user['full_name'] . '!');
+                    header('Location: ' . admin_url('index.php'));
+                    exit;
+                } else {
+                    $errorMsg = 'Invalid username or password.';
                 }
-
-                $_SESSION['admin_user_id'] = $user['id'];
-                $_SESSION['admin_username'] = $user['username'];
-                set_flash('success', 'Welcome back, ' . $user['full_name'] . '!');
-                header('Location: /admin/index.php');
-                exit;
-            } else {
-                $errorMsg = 'Invalid username or password.';
+            } catch (Exception $e) {
+                $errorMsg = 'Database connection error: ' . $e->getMessage();
             }
         }
     }
@@ -52,13 +55,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login | Global Connect CMS</title>
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo.svg">
-    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="icon" type="image/svg+xml" href="<?= image_url('logo.svg') ?>">
+    <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
 </head>
 <body class="login-body">
     <div class="login-card">
         <div class="login-header">
-            <img src="/assets/images/logo.svg" alt="Global Connect">
+            <img src="<?= image_url('logo.svg') ?>" alt="Global Connect">
             <h2>Administration Panel</h2>
             <p>Enter your credentials to manage Global Connect CMS</p>
         </div>
@@ -75,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php endif; ?>
 
-        <form action="/admin/login.php" method="POST">
+        <form action="<?= admin_url('login.php') ?>" method="POST">
             <?= csrf_field() ?>
 
             <div class="admin-form-group">
@@ -95,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <div style="margin-top: 25px; text-align: center; border-top: 1px solid var(--admin-border); padding-top: 15px;">
-            <a href="/index.php" style="color: var(--admin-primary); font-size: 13px; text-decoration: none;">← Return to Public Website</a>
+            <a href="<?= url('index.php') ?>" style="color: var(--admin-primary); font-size: 13px; text-decoration: none;">← Return to Public Website</a>
         </div>
     </div>
 </body>

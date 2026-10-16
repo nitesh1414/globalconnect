@@ -1,93 +1,93 @@
 <?php
 /**
- * Global Connect - Public Footer Component
+ * Global Connect - Footer Component
  */
-$footerAbout = get_setting('footer_about', 'At Global Connect, we believe in building meaningful partnerships that drive success across borders. With our expertise and network, we connect businesses to new markets and lasting opportunities.');
-$addrSg = get_setting('address_sg', '101 KITCHENER ROAD #03-43 JALAN BESAR PLAZA SINGAPORE (208511)');
-$addrIn = get_setting('address_india', 'NO. 211 RAJNIGANDHA BLOCK, GARDEN APARTMENT, 21 VITTHAL MALLYA ROAD (opp. UB CITY) BANGLORE 560001 INDIA');
-$phoneSg = get_setting('header_phone_sg', '(65) 89451100');
-$phoneRoam = get_setting('header_phone_roam', '(91) 99100 02299');
-$emailPrimary = get_setting('contact_email_primary', 'admin@globalconnectsg.com');
-
-$tradingPages = get_pages_by_category('trading');
-$financePages = get_pages_by_category('finance');
+$tradingFooterPages = get_pages_by_category('trading');
+$financeFooterPages = get_pages_by_category('finance');
 ?>
-    <!-- Site Footer -->
+
+    <!-- Footer Area -->
     <footer class="site-footer">
-        <div class="container">
-            <div class="footer-grid">
-                <!-- Col 1: About -->
-                <div class="footer-widget footer-about">
-                    <h4>Global Connect</h4>
-                    <p><?= e($footerAbout) ?></p>
-                    <div class="footer-contact-item">
-                        <strong>Singapore Mob:</strong> <?= e($phoneSg) ?>
-                    </div>
-                    <div class="footer-contact-item">
-                        <strong>Global Roam:</strong> <?= e($phoneRoam) ?>
-                    </div>
-                    <div class="footer-contact-item">
-                        <strong>Email:</strong> <a href="mailto:<?= e($emailPrimary) ?>"><?= e($emailPrimary) ?></a>
+        <div class="footer-container">
+            <!-- Col 1: About & Registered Offices -->
+            <div class="footer-col">
+                <div class="footer-logo">GLOBAL <span>CONNECT</span></div>
+                <p class="footer-desc">
+                    Global Connect is a premier international trade facilitator and financial structuring partner headquartered in Singapore and India, operating across Southeast Asia and global commodity hubs.
+                </p>
+                <div style="margin-top: 15px; font-size: 13px; color: var(--text-light);">
+                    <p style="margin-bottom: 6px;"><strong>Singapore Global HQ:</strong><br>101 Kitchener Road #03-43, Jalan Besar Plaza, Singapore (208511)</p>
+                    <p style="margin-bottom: 6px;"><strong>India Corporate Office:</strong><br>No. 211 Rajnigandha Block, Garden Apartment, 21 Vitthal Mallya Road, Bangalore 560001</p>
+                </div>
+            </div>
+
+            <!-- Col 2: Trading Portfolio Links -->
+            <div class="footer-col">
+                <h4 class="footer-title">Trading Portfolio</h4>
+                <ul class="footer-links">
+                    <li><a href="<?= url('trading.php') ?>">All Trading Services</a></li>
+                    <?php foreach (array_slice($tradingFooterPages, 0, 5) as $tp): ?>
+                        <li><a href="<?= url('page.php?slug=' . urlencode($tp['slug'])) ?>"><?= e($tp['title']) ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+
+            <!-- Col 3: Finance & Advisory -->
+            <div class="footer-col">
+                <h4 class="footer-title">Finance &amp; Advisory</h4>
+                <ul class="footer-links">
+                    <li><a href="<?= url('finance.php') ?>">All Finance Services</a></li>
+                    <?php foreach (array_slice($financeFooterPages, 0, 4) as $fp): ?>
+                        <li><a href="<?= url('page.php?slug=' . urlencode($fp['slug'])) ?>"><?= e($fp['title']) ?></a></li>
+                    <?php endforeach; ?>
+                    <li><a href="<?= url('consulting.php') ?>">Corporate Consulting</a></li>
+                </ul>
+            </div>
+
+            <!-- Col 4: Quick Contact Desk -->
+            <div class="footer-col">
+                <h4 class="footer-title">Global Contact Desk</h4>
+                <div class="footer-contact-item">
+                    <span class="footer-contact-icon">📞</span>
+                    <div>
+                        <small style="color: var(--text-muted); display: block;">Singapore Office:</small>
+                        <a href="tel:+6589451100">(65) 89451100</a>
                     </div>
                 </div>
-
-                <!-- Col 2: Trading Links -->
-                <div class="footer-widget">
-                    <h4>Trading Products</h4>
-                    <ul class="footer-links">
-                        <li><a href="/trading.php">All Trading Services</a></li>
-                        <?php foreach (array_slice($tradingPages, 0, 5) as $tp): ?>
-                            <li><a href="/page.php?slug=<?= e($tp['slug']) ?>"><?= e($tp['title']) ?></a></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-
-                <!-- Col 3: Finance Links -->
-                <div class="footer-widget">
-                    <h4>Finance Services</h4>
-                    <ul class="footer-links">
-                        <li><a href="/finance.php">All Finance Services</a></li>
-                        <?php foreach (array_slice($financePages, 0, 5) as $fp): ?>
-                            <li><a href="/page.php?slug=<?= e($fp['slug']) ?>"><?= e($fp['title']) ?></a></li>
-                        <?php endforeach; ?>
-                        <li><a href="/consulting.php">Corporate Consulting</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Corporate Locations -->
-                <div class="footer-widget">
-                    <h4>Headquarters</h4>
-                    <div class="footer-contact-item">
-                        <strong>Global HQ (Singapore):</strong>
-                        <?= e($addrSg) ?>
+                <div class="footer-contact-item">
+                    <span class="footer-contact-icon">📱</span>
+                    <div>
+                        <small style="color: var(--text-muted); display: block;">Global Roaming (24/7):</small>
+                        <a href="tel:+919910002299">(91) 99100 02299</a>
                     </div>
-                    <div class="footer-contact-item">
-                        <strong>India HQ (Bangalore):</strong>
-                        <?= e($addrIn) ?>
-                    </div>
-                    <div class="footer-contact-item">
-                        <strong>Regional Presences:</strong>
-                        Indonesia (Grand Hyatt Jakarta) • Hong Kong (Hyatt Regency) • New Delhi • Mumbai
+                </div>
+                <div class="footer-contact-item">
+                    <span class="footer-contact-icon">✉</span>
+                    <div>
+                        <small style="color: var(--text-muted); display: block;">Direct Enquiries:</small>
+                        <a href="mailto:admin@globalconnectsg.com">admin@globalconnectsg.com</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer Bottom Bar -->
         <div class="footer-bottom">
             <div class="footer-bottom-container">
-                <p>&copy; <?= date('Y') ?> Global Connect. All Rights Reserved. Headquartered in Singapore & India.</p>
                 <div>
-                    <a href="/about.php">About</a> &bull; 
-                    <a href="/trading.php">Trading</a> &bull; 
-                    <a href="/finance.php">Finance</a> &bull; 
-                    <a href="/contact.php">Contact</a> &bull; 
-                    <a href="/admin/index.php" style="color: var(--accent-gold); font-weight: 600;">Admin Panel</a>
+                    &copy; <?= date('Y') ?> <strong>Global Connect</strong>. All rights reserved. | Sourcing &amp; Supply Chain Strategic Partner.
+                </div>
+                <div>
+                    <a href="<?= url('about.php') ?>">About</a> &bull; 
+                    <a href="<?= url('trading.php') ?>">Trading</a> &bull; 
+                    <a href="<?= url('finance.php') ?>">Finance</a> &bull; 
+                    <a href="<?= url('contact.php') ?>">Contact</a> &bull; 
+                    <a href="<?= admin_url('index.php') ?>" style="color: var(--accent-gold); font-weight: 600;">Admin Panel</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <script src="/assets/js/main.js"></script>
+    <!-- Core Scripts -->
+    <script src="<?= asset('js/main.js') ?>"></script>
 </body>
 </html>

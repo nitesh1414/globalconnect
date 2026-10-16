@@ -2,31 +2,39 @@
 /**
  * Global Connect - Admin Dashboard
  */
-$adminPageTitle = 'Dashboard | Global Connect CMS';
-$adminPageHeading = 'CMS Dashboard Overview';
-
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/auth.php';
 
 $db = get_db();
 
 // Metrics
-$totalPages = $db->query("SELECT COUNT(*) FROM pages")->fetchColumn();
-$tradingPagesCount = $db->query("SELECT COUNT(*) FROM pages WHERE category_id = (SELECT id FROM categories WHERE slug = 'trading')")->fetchColumn();
-$financePagesCount = $db->query("SELECT COUNT(*) FROM pages WHERE category_id = (SELECT id FROM categories WHERE slug = 'finance')")->fetchColumn();
-$totalInquiries = $db->query("SELECT COUNT(*) FROM contacts")->fetchColumn();
-$unreadInquiries = $db->query("SELECT COUNT(*) FROM contacts WHERE status = 'unread'")->fetchColumn();
+$totalPages = 0;
+$tradingPagesCount = 0;
+$financePagesCount = 0;
+$totalInquiries = 0;
+$unreadInquiries = 0;
+$recentInquiries = [];
+$recentPages = [];
 
-// Recent inquiries
-$recentInquiries = $db->query("SELECT * FROM contacts ORDER BY created_at DESC LIMIT 5")->fetchAll();
+try {
+    $totalPages = $db->query("SELECT COUNT(*) FROM pages")->fetchColumn();
+    $tradingPagesCount = $db->query("SELECT COUNT(*) FROM pages WHERE category_id = (SELECT id FROM categories WHERE slug = 'trading')")->fetchColumn();
+    $financePagesCount = $db->query("SELECT COUNT(*) FROM pages WHERE category_id = (SELECT id FROM categories WHERE slug = 'finance')")->fetchColumn();
+    $totalInquiries = $db->query("SELECT COUNT(*) FROM contacts")->fetchColumn();
+    $unreadInquiries = $db->query("SELECT COUNT(*) FROM contacts WHERE status = 'unread'")->fetchColumn();
 
-// Recent pages
-$recentPages = $db->query("
-    SELECT p.*, c.name as category_name, c.slug as category_slug 
-    FROM pages p 
-    LEFT JOIN categories c ON p.category_id = c.id 
-    ORDER BY p.updated_at DESC, p.id DESC 
-    LIMIT 6
-")->fetchAll();
+    $recentInquiries = $db->query("SELECT * FROM contacts ORDER BY created_at DESC LIMIT 5")->fetchAll();
+    $recentPages = $db->query("
+        SELECT p.*, c.name as category_name, c.slug as category_slug 
+        FROM pages p 
+        LEFT JOIN categories c ON p.category_id = c.id 
+        ORDER BY p.updated_at DESC, p.id DESC 
+        LIMIT 6
+    ")->fetchAll();
+} catch (Exception $e) {}
+
+$adminPageTitle = 'Dashboard | Global Connect CMS';
+$adminPageHeading = 'CMS Dashboard Overview';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <!-- KPI Overview Grid -->
@@ -70,19 +78,19 @@ $recentPages = $db->query("
         <h3>Quick Content Actions</h3>
     </div>
     <div class="admin-card-body" style="display: flex; gap: 15px; flex-wrap: wrap;">
-        <a href="/admin/page-add.php?category=trading" class="btn-admin-primary" style="background: #0284c7;">
+        <a href="<?= admin_url('page-add.php?category=trading') ?>" class="btn-admin-primary" style="background: #0284c7;">
             <span>+</span> Add New Trading Page
         </a>
-        <a href="/admin/page-add.php?category=finance" class="btn-admin-primary" style="background: #16a34a;">
+        <a href="<?= admin_url('page-add.php?category=finance') ?>" class="btn-admin-primary" style="background: #16a34a;">
             <span>+</span> Add New Finance Page
         </a>
-        <a href="/admin/page-add.php" class="btn-admin-primary" style="background: #0f172a;">
+        <a href="<?= admin_url('page-add.php') ?>" class="btn-admin-primary" style="background: #0f172a;">
             <span>+</span> Add Custom Page
         </a>
-        <a href="/admin/contacts.php" class="btn-admin-primary" style="background: #d97706;">
+        <a href="<?= admin_url('contacts.php') ?>" class="btn-admin-primary" style="background: #d97706;">
             <span>✉</span> View Contact Inquiries (<?= $unreadInquiries ?>)
         </a>
-        <a href="/admin/settings.php" class="btn-admin-primary" style="background: #475569;">
+        <a href="<?= admin_url('settings.php') ?>" class="btn-admin-primary" style="background: #475569;">
             <span>⚙</span> Update Site Settings
         </a>
     </div>
@@ -93,7 +101,7 @@ $recentPages = $db->query("
     <div class="admin-card">
         <div class="admin-card-header">
             <h3>Recent Website Pages</h3>
-            <a href="/admin/pages.php" style="font-size: 13px; color: var(--admin-primary); font-weight: 600;">View All Pages →</a>
+            <a href="<?= admin_url('pages.php') ?>" style="font-size: 13px; color: var(--admin-primary); font-weight: 600;">View All Pages →</a>
         </div>
         <div class="admin-card-body" style="padding: 0;">
             <table class="admin-table">
@@ -124,8 +132,8 @@ $recentPages = $db->query("
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="/admin/page-edit.php?id=<?= $rp['id'] ?>" class="btn-action btn-edit">Edit</a>
-                                    <a href="/page.php?slug=<?= e($rp['slug']) ?>" target="_blank" class="btn-action btn-view">View</a>
+                                    <a href="<?= admin_url('page-edit.php?id=' . $rp['id']) ?>" class="btn-action btn-edit">Edit</a>
+                                    <a href="<?= url('page.php?slug=' . urlencode($rp['slug'])) ?>" target="_blank" class="btn-action btn-view">View</a>
                                 </div>
                             </td>
                         </tr>
@@ -139,7 +147,7 @@ $recentPages = $db->query("
     <div class="admin-card">
         <div class="admin-card-header">
             <h3>Recent Inquiries</h3>
-            <a href="/admin/contacts.php" style="font-size: 13px; color: var(--admin-primary); font-weight: 600;">Inbox (<?= $totalInquiries ?>) →</a>
+            <a href="<?= admin_url('contacts.php') ?>" style="font-size: 13px; color: var(--admin-primary); font-weight: 600;">Inbox (<?= $totalInquiries ?>) →</a>
         </div>
         <div class="admin-card-body" style="padding: 0;">
             <?php if (!empty($recentInquiries)): ?>
@@ -168,7 +176,7 @@ $recentPages = $db->query("
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="/admin/contacts.php?id=<?= $inq['id'] ?>" class="btn-action btn-edit">Open</a>
+                                    <a href="<?= admin_url('contacts.php?id=' . $inq['id']) ?>" class="btn-action btn-edit">Open</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

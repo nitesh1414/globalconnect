@@ -21,12 +21,47 @@ function get_db(): PDO {
 function base_url(string $path = ''): string {
     static $base = null;
     if ($base === null) {
-        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-        $dir = str_replace('\\', '/', dirname($scriptName));
+        $script = $_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '';
+        $dir = str_replace('\\', '/', dirname($script));
         
-        // Remove /admin or /includes if running from subdirectories
-        $dir = preg_replace('/(\/(admin|includes|config))$/', '', $dir);
-        $base = rtrim($dir, '/');
+        // Remove /admin, /includes, /config from the end
+        $dir = preg_replace('#/(admin|includes|config)$#i', '', $dir);
+        $dir = rtrim($dir, '/');
+        
+        // Ensure leading slash if not empty
+        if (!empty($dir) && $dir[0] !== '/') {
+            $dir = '/' . $dir;
+        }
+
+        // Fallback check against DOCUMENT_ROOT if script is in root but app is in subfolder
+        if (empty($dir) && isset($_SERVER['DOCUMENT_ROOT'])) {
+            $appRoot = str_replace('\\', '/', realpath(__DIR__ . '/..') ?: dirname(__DIR__));
+            $docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT']) ?: $_SERVER['DOCUMENT_ROOT']);
+            if (!empty($docRoot) && strpos($appRoot, $docRoot) === 0) {
+                $sub = substr($appRoot, strlen($docRoot));
+                $sub = rtrim(str_replace('\\', '/', $sub), '/');
+                if (!empty($sub)) {
+                    $dir = ($sub[0] === '/') ? $sub : '/' . $sub;
+                }
+            }
+        }
+
+        // Fallback check against REQUEST_URI for known subfolders if SCRIPT_NAME is /index.php
+        if (empty($dir) && isset($_SERVER['REQUEST_URI'])) {
+            $reqUri = explode('?', $_SERVER['REQUEST_URI'])[0];
+            if (preg_match('#^/([^/]+)(/|$)#', $reqUri, $m)) {
+                $segment = $m[1];
+                if (!in_array($segment, ['assets', 'uploads', 'api']) && !preg_match('#\.(php|html|css|js|png|jpg|svg)$#i', $segment)) {
+                    // Check if this segment corresponds to folder name
+                    $appFolder = basename(dirname(__DIR__));
+                    if ($segment === $appFolder || in_array($segment, ['mysite', 'globalconnect', 'site'])) {
+                        $dir = '/' . $segment;
+                    }
+                }
+            }
+        }
+
+        $base = $dir;
     }
     
     $cleanPath = ltrim($path, '/');
@@ -66,7 +101,7 @@ function image_url(string $filename = ''): string {
     if (strpos($filename, 'uploads/') === 0 || strpos($filename, '/uploads/') === 0) {
         return base_url(ltrim($filename, '/'));
     }
-    // Check if file exists in uploads or assets/images
+    // Check if file exists in uploads
     if (file_exists(__DIR__ . '/../uploads/' . $filename)) {
         return base_url('uploads/' . $filename);
     }

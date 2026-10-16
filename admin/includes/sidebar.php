@@ -3,21 +3,26 @@
  * Global Connect - Admin Sidebar
  */
 $db = get_db();
-$unreadInquiries = $db->query("SELECT COUNT(*) FROM contacts WHERE status = 'unread'")->fetchColumn();
-$totalPages = $db->query("SELECT COUNT(*) FROM pages")->fetchColumn();
+$unreadInquiries = 0;
+$totalPages = 0;
+try {
+    $unreadInquiries = $db->query("SELECT COUNT(*) FROM contacts WHERE status = 'unread'")->fetchColumn();
+    $totalPages = $db->query("SELECT COUNT(*) FROM pages")->fetchColumn();
+} catch (Exception $e) {}
+
 $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
 $categoryParam = $_GET['category'] ?? '';
 ?>
 <aside class="admin-sidebar">
     <div class="sidebar-header">
-        <img src="/assets/images/logo.svg" alt="Global Connect">
+        <img src="<?= image_url('logo.svg') ?>" alt="Global Connect">
         <div class="sidebar-brand-text">GLOBAL <span>CONNECT</span> CMS</div>
     </div>
 
     <ul class="sidebar-menu">
         <li class="sidebar-heading">Main</li>
         <li class="sidebar-item <?= $currentScript === 'index.php' ? 'active' : '' ?>">
-            <a href="/admin/index.php" class="sidebar-link">
+            <a href="<?= admin_url('index.php') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">📊</span>
                     <span>Dashboard</span>
@@ -27,7 +32,7 @@ $categoryParam = $_GET['category'] ?? '';
 
         <li class="sidebar-heading">Content Management</li>
         <li class="sidebar-item <?= ($currentScript === 'pages.php' && empty($categoryParam)) ? 'active' : '' ?>">
-            <a href="/admin/pages.php" class="sidebar-link">
+            <a href="<?= admin_url('pages.php') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">📄</span>
                     <span>All Pages</span>
@@ -37,7 +42,7 @@ $categoryParam = $_GET['category'] ?? '';
         </li>
 
         <li class="sidebar-item <?= ($currentScript === 'page-add.php' && $categoryParam === 'trading') ? 'active' : '' ?>">
-            <a href="/admin/page-add.php?category=trading" class="sidebar-link">
+            <a href="<?= admin_url('page-add.php?category=trading') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">📦</span>
                     <span>+ Add Trading Page</span>
@@ -46,7 +51,7 @@ $categoryParam = $_GET['category'] ?? '';
         </li>
 
         <li class="sidebar-item <?= ($currentScript === 'page-add.php' && $categoryParam === 'finance') ? 'active' : '' ?>">
-            <a href="/admin/page-add.php?category=finance" class="sidebar-link">
+            <a href="<?= admin_url('page-add.php?category=finance') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">💳</span>
                     <span>+ Add Finance Page</span>
@@ -55,7 +60,7 @@ $categoryParam = $_GET['category'] ?? '';
         </li>
 
         <li class="sidebar-item <?= $currentScript === 'categories.php' ? 'active' : '' ?>">
-            <a href="/admin/categories.php" class="sidebar-link">
+            <a href="<?= admin_url('categories.php') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">📂</span>
                     <span>Categories</span>
@@ -64,7 +69,7 @@ $categoryParam = $_GET['category'] ?? '';
         </li>
 
         <li class="sidebar-item <?= $currentScript === 'media.php' ? 'active' : '' ?>">
-            <a href="/admin/media.php" class="sidebar-link">
+            <a href="<?= admin_url('media.php') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">🖼</span>
                     <span>Media Library</span>
@@ -74,7 +79,7 @@ $categoryParam = $_GET['category'] ?? '';
 
         <li class="sidebar-heading">Inquiries & Leads</li>
         <li class="sidebar-item <?= $currentScript === 'contacts.php' ? 'active' : '' ?>">
-            <a href="/admin/contacts.php" class="sidebar-link">
+            <a href="<?= admin_url('contacts.php') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">✉</span>
                     <span>Inquiries</span>
@@ -87,7 +92,7 @@ $categoryParam = $_GET['category'] ?? '';
 
         <li class="sidebar-heading">Configuration</li>
         <li class="sidebar-item <?= $currentScript === 'settings.php' ? 'active' : '' ?>">
-            <a href="/admin/settings.php" class="sidebar-link">
+            <a href="<?= admin_url('settings.php') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">⚙</span>
                     <span>Site Settings</span>
@@ -96,7 +101,7 @@ $categoryParam = $_GET['category'] ?? '';
         </li>
 
         <li class="sidebar-item <?= $currentScript === 'profile.php' ? 'active' : '' ?>">
-            <a href="/admin/profile.php" class="sidebar-link">
+            <a href="<?= admin_url('profile.php') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">👤</span>
                     <span>Admin Profile</span>
@@ -105,7 +110,7 @@ $categoryParam = $_GET['category'] ?? '';
         </li>
 
         <li class="sidebar-item">
-            <a href="/admin/logout.php" class="sidebar-link" style="color: #f87171;">
+            <a href="<?= admin_url('logout.php') ?>" class="sidebar-link" style="color: #f87171;">
                 <div class="sidebar-link-content">
                     <span class="sidebar-link-icon">🚪</span>
                     <span>Log Out</span>
@@ -116,6 +121,6 @@ $categoryParam = $_GET['category'] ?? '';
 
     <div class="sidebar-footer">
         <span>Global Connect CMS</span>
-        <span style="color: var(--admin-gold);">Core PHP</span>
+        <span style="color: var(--admin-gold);">Core PHP &amp; MySQL</span>
     </div>
 </aside>

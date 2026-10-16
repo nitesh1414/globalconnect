@@ -2,10 +2,7 @@
 /**
  * Global Connect - Pages Management
  */
-$adminPageTitle = 'Pages Manager | Global Connect CMS';
-$adminPageHeading = 'CMS Page Management';
-
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/auth.php';
 
 $db = get_db();
 
@@ -34,26 +31,33 @@ if (!empty($search)) {
 
 $sql .= " ORDER BY c.menu_order ASC, p.menu_order ASC, p.id ASC";
 
-$stmt = $db->prepare($sql);
-$stmt->execute($params);
-$pages = $stmt->fetchAll();
+$pages = [];
+try {
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    $pages = $stmt->fetchAll();
+} catch (Exception $e) {}
 
 $categories = get_all_categories();
+
+$adminPageTitle = 'Pages Manager | Global Connect CMS';
+$adminPageHeading = 'CMS Page Management';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="admin-card">
     <div class="admin-card-header" style="flex-wrap: wrap; gap: 15px;">
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <a href="/admin/pages.php" class="btn-action <?= empty($filterCategory) ? 'btn-edit' : 'btn-view' ?>">All (<?= $totalPages ?>)</a>
+            <a href="<?= admin_url('pages.php') ?>" class="btn-action <?= empty($filterCategory) ? 'btn-edit' : 'btn-view' ?>">All (<?= count($pages) ?>)</a>
             <?php foreach ($categories as $cat): ?>
-                <a href="/admin/pages.php?category=<?= e($cat['slug']) ?>" class="btn-action <?= $filterCategory === $cat['slug'] ? 'btn-edit' : 'btn-view' ?>">
+                <a href="<?= admin_url('pages.php?category=' . urlencode($cat['slug'])) ?>" class="btn-action <?= $filterCategory === $cat['slug'] ? 'btn-edit' : 'btn-view' ?>">
                     <?= e($cat['name']) ?>
                 </a>
             <?php endforeach; ?>
         </div>
 
         <div style="display: flex; gap: 12px; align-items: center;">
-            <form action="/admin/pages.php" method="GET" style="display: flex; gap: 8px;">
+            <form action="<?= admin_url('pages.php') ?>" method="GET" style="display: flex; gap: 8px;">
                 <?php if (!empty($filterCategory)): ?>
                     <input type="hidden" name="category" value="<?= e($filterCategory) ?>">
                 <?php endif; ?>
@@ -61,7 +65,7 @@ $categories = get_all_categories();
                 <button type="submit" class="btn-admin-primary" style="padding: 6px 14px; font-size: 13px;">Search</button>
             </form>
 
-            <a href="/admin/page-add.php<?= !empty($filterCategory) ? '?category=' . urlencode($filterCategory) : '' ?>" class="btn-admin-primary">
+            <a href="<?= admin_url('page-add.php' . (!empty($filterCategory) ? '?category=' . urlencode($filterCategory) : '')) ?>" class="btn-admin-primary">
                 <span>+</span> Add New Page
             </a>
         </div>
@@ -85,7 +89,7 @@ $categories = get_all_categories();
                         <tr>
                             <td>
                                 <?php if (!empty($p['featured_image'])): ?>
-                                    <img src="<?= e($p['featured_image']) ?>" alt="" style="width: 44px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--admin-border);">
+                                    <img src="<?= image_url($p['featured_image']) ?>" alt="" style="width: 44px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--admin-border);">
                                 <?php else: ?>
                                     <div style="width: 44px; height: 32px; background: #e2e8f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #64748b;">N/A</div>
                                 <?php endif; ?>
@@ -110,10 +114,10 @@ $categories = get_all_categories();
                             <td><?= (int)$p['menu_order'] ?></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="/admin/page-edit.php?id=<?= $p['id'] ?>" class="btn-action btn-edit">Edit</a>
-                                    <a href="/page.php?slug=<?= e($p['slug']) ?>" target="_blank" class="btn-action btn-view">View</a>
+                                    <a href="<?= admin_url('page-edit.php?id=' . $p['id']) ?>" class="btn-action btn-edit">Edit</a>
+                                    <a href="<?= url('page.php?slug=' . urlencode($p['slug'])) ?>" target="_blank" class="btn-action btn-view">View</a>
                                     <?php if (!$p['is_system']): ?>
-                                        <a href="/admin/page-delete.php?id=<?= $p['id'] ?>" class="btn-action btn-delete" onclick="return confirm('Are you sure you want to delete &quot;<?= e($p['title']) ?>&quot;? This cannot be undone.');">Delete</a>
+                                        <a href="<?= admin_url('page-delete.php?id=' . $p['id']) ?>" class="btn-action btn-delete" onclick="return confirm('Are you sure you want to delete &quot;<?= e($p['title']) ?>&quot;? This cannot be undone.');">Delete</a>
                                     <?php endif; ?>
                                 </div>
                             </td>

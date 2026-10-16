@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/functions.php';
 $slug = clean($_GET['slug'] ?? '');
 
 if (empty($slug)) {
-    header('Location: /index.php');
+    header('Location: ' . url('index.php'));
     exit;
 }
 
@@ -29,7 +29,7 @@ if (!$page) {
         <div class="container text-center" style="padding: 60px 0;">
             <h2>404 - Page Not Found</h2>
             <p class="text-muted" style="margin: 20px 0;">The page you are looking for may have been moved or removed.</p>
-            <a href="/index.php" class="btn-primary">Return to Home</a>
+            <a href="<?= url('index.php') ?>" class="btn-primary">Return to Home</a>
         </div>
     </div>
     <?php
@@ -45,6 +45,14 @@ $categorySlug = $page['category_slug'] ?? 'trading';
 $categoryName = $page['category_name'] ?? 'Services';
 $siblingPages = get_pages_by_category($categorySlug);
 
+// Clean content to ensure image sources are resolved properly
+$contentHtml = $page['content'] ?? '';
+$contentHtml = preg_replace_callback('/<img[^>]+src=([\'"])([^\'"]+)([\'"])/i', function($matches) {
+    $src = $matches[2];
+    $resolved = image_url($src);
+    return str_replace($src, $resolved, $matches[0]);
+}, $contentHtml);
+
 require_once __DIR__ . '/includes/header.php';
 ?>
 
@@ -54,9 +62,9 @@ require_once __DIR__ . '/includes/header.php';
         <h1 class="page-banner-title"><?= e($page['title']) ?></h1>
         <p class="page-banner-subtitle"><?= e($page['banner_subtitle'] ?: ($page['subtitle'] ?: 'Global Connect ' . $categoryName)) ?></p>
         <div class="breadcrumb-nav">
-            <a href="/index.php">Home</a> 
+            <a href="<?= url('index.php') ?>">Home</a> 
             <span>/</span> 
-            <a href="/<?= e($categorySlug) ?>.php"><?= e($categoryName) ?></a> 
+            <a href="<?= url($categorySlug . '.php') ?>"><?= e($categoryName) ?></a> 
             <span>/</span> 
             <span><?= e($page['title']) ?></span>
         </div>
@@ -68,7 +76,7 @@ require_once __DIR__ . '/includes/header.php';
         <div style="display: grid; grid-template-columns: 2.4fr 1fr; gap: 40px;" class="page-layout-grid">
             <!-- Main Content Area -->
             <div class="content-body">
-                <?= $page['content'] ?>
+                <?= $contentHtml ?>
             </div>
 
             <!-- Sidebar Navigation -->
@@ -81,7 +89,7 @@ require_once __DIR__ . '/includes/header.php';
                     <ul class="footer-links" style="margin-left: 0;">
                         <?php foreach ($siblingPages as $sp): ?>
                             <li style="margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <a href="/page.php?slug=<?= e($sp['slug']) ?>" style="font-weight: <?= $sp['slug'] === $slug ? '700' : '500' ?>; color: <?= $sp['slug'] === $slug ? 'var(--secondary-color)' : 'var(--text-main)' ?>; display: flex; justify-content: space-between; align-items: center;">
+                                <a href="<?= url('page.php?slug=' . urlencode($sp['slug'])) ?>" style="font-weight: <?= $sp['slug'] === $slug ? '700' : '500' ?>; color: <?= $sp['slug'] === $slug ? 'var(--secondary-color)' : 'var(--text-main)' ?>; display: flex; justify-content: space-between; align-items: center;">
                                     <span><?= e($sp['title']) ?></span>
                                     <span><?= $sp['slug'] === $slug ? '●' : '›' ?></span>
                                 </a>
@@ -104,7 +112,7 @@ require_once __DIR__ . '/includes/header.php';
                         <small style="color: var(--accent-gold); display: block; font-weight: 700;">Direct Email:</small>
                         <a href="mailto:admin@globalconnectsg.com" style="color: #ffffff; font-weight: 600;">admin@globalconnectsg.com</a>
                     </div>
-                    <a href="/contact.php" class="btn-gold" style="width: 100%; text-align: center;">
+                    <a href="<?= url('contact.php') ?>" class="btn-gold" style="width: 100%; text-align: center;">
                         Inquire Now →
                     </a>
                 </div>

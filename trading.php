@@ -17,7 +17,7 @@ $tradingPages = get_pages_by_category('trading');
         <h1 class="page-banner-title">Trading</h1>
         <p class="page-banner-subtitle">Global commodities and resources traded across worldwide markets</p>
         <div class="breadcrumb-nav">
-            <a href="/index.php">Home</a> <span>/</span> <span>Trading</span>
+            <a href="<?= url('index.php') ?>">Home</a> <span>/</span> <span>Trading</span>
         </div>
     </div>
 </div>
@@ -39,20 +39,20 @@ $tradingPages = get_pages_by_category('trading');
                 <?php foreach ($tradingPages as $p): ?>
                     <div class="service-card">
                         <div class="service-card-image">
-                            <a href="/page.php?slug=<?= e($p['slug']) ?>">
-                                <img src="<?= e($p['featured_image'] ?: '/assets/images/trading-home.jpg') ?>" alt="<?= e($p['title']) ?>" loading="lazy">
+                            <a href="<?= url('page.php?slug=' . urlencode($p['slug'])) ?>">
+                                <img src="<?= image_url($p['featured_image'] ?: 'trading-home.jpg') ?>" alt="<?= e($p['title']) ?>" loading="lazy">
                             </a>
                         </div>
                         <div class="service-card-body">
                             <h3 class="service-card-title">
-                                <a href="/page.php?slug=<?= e($p['slug']) ?>" style="color: inherit;">
+                                <a href="<?= url('page.php?slug=' . urlencode($p['slug'])) ?>" style="color: inherit;">
                                     <?= e($p['title']) ?>
                                 </a>
                             </h3>
                             <p class="service-card-text">
                                 <?= e($p['summary'] ?: 'Explore our ' . $p['title'] . ' trading solutions and international supply capabilities.') ?>
                             </p>
-                            <a href="/page.php?slug=<?= e($p['slug']) ?>" class="service-card-link">
+                            <a href="<?= url('page.php?slug=' . urlencode($p['slug'])) ?>" class="service-card-link">
                                 Read More +
                             </a>
                         </div>

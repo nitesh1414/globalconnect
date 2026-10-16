@@ -1,32 +1,31 @@
 <?php
 /**
- * Global Connect - Public Header Component
+ * Global Connect - Header Component
  */
 require_once __DIR__ . '/functions.php';
 
-$siteTitle = get_setting('site_title', 'Global Connect');
+$siteTitle = get_setting('site_title', 'Global Connect | Global Business Enterprise Headquartered in Singapore & India');
+$siteName = get_setting('company_name', 'Global Connect');
+$siteTagline = get_setting('site_tagline', 'We are a global business enterprise headquartered in Singapore And India');
 $phoneSg = get_setting('header_phone_sg', '(65) 89451100');
 $phoneRoam = get_setting('header_phone_roam', '(91) 99100 02299');
 $emailPrimary = get_setting('contact_email_primary', 'admin@globalconnectsg.com');
 $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg.com');
-$logoUrl = get_setting('logo_url', '/assets/images/logo.svg');
+$logoUrl = get_setting('logo_url', 'logo.svg');
 
-// Fetch dynamic subpages for Trading and Finance dropdowns
-$tradingPages = get_pages_by_category('trading');
-$financePages = get_pages_by_category('finance');
-
-$pageTitle = $pageTitle ?? $siteTitle . ' | Global Business Enterprise Headquartered in Singapore & India';
-$pageMetaDesc = $pageMetaDesc ?? 'Global Connect - Reliable partner for international trade services, trade finance, and corporate financial advisory.';
+// Dynamic subpages for dropdown menus
+$tradingSubpages = get_pages_by_category('trading');
+$financeSubpages = get_pages_by_category('finance');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= e($pageTitle) ?></title>
-    <meta name="description" content="<?= e($pageMetaDesc) ?>">
-    <link rel="icon" type="image/svg+xml" href="/assets/images/logo.svg">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <title><?= e($pageTitle ?? $siteTitle) ?></title>
+    <meta name="description" content="<?= e($pageMetaDesc ?? 'We are a global business enterprise headquartered in Singapore And India. Reliable partner for international trade services, trade finance, and financial advisory.') ?>">
+    <link rel="icon" type="image/svg+xml" href="<?= image_url('logo.svg') ?>">
+    <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 </head>
 <body>
 
@@ -36,11 +35,11 @@ $pageMetaDesc = $pageMetaDesc ?? 'Global Connect - Reliable partner for internat
             <div class="top-bar-left">
                 <div class="top-bar-item">
                     <span class="tag">Singapore</span>
-                    <a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $phoneSg)) ?>"><?= e($phoneSg) ?></a>
+                    <a href="tel:<?= preg_replace('/[^0-9+]/', '', $phoneSg) ?>"><?= e($phoneSg) ?></a>
                 </div>
                 <div class="top-bar-item">
                     <span class="tag">Global Roam</span>
-                    <a href="tel:<?= e(preg_replace('/[^0-9+]/', '', $phoneRoam)) ?>"><?= e($phoneRoam) ?></a>
+                    <a href="tel:<?= preg_replace('/[^0-9+]/', '', $phoneRoam) ?>"><?= e($phoneRoam) ?></a>
                 </div>
             </div>
             <div class="top-bar-right">
@@ -59,30 +58,30 @@ $pageMetaDesc = $pageMetaDesc ?? 'Global Connect - Reliable partner for internat
     <header class="site-header">
         <div class="header-container">
             <!-- Brand Logo -->
-            <a href="/index.php" class="site-logo" title="<?= e($siteTitle) ?>">
-                <img src="<?= e($logoUrl) ?>" alt="<?= e($siteTitle) ?> Logo" width="220" height="52">
+            <a href="<?= url('index.php') ?>" class="site-logo" title="<?= e($siteTitle) ?>">
+                <img src="<?= image_url($logoUrl) ?>" alt="<?= e($siteName) ?> Logo" width="220" height="52">
             </a>
 
             <!-- Navigation Bar -->
             <nav class="main-nav" aria-label="Main Navigation">
                 <ul class="nav-menu" id="navMenu">
                     <li class="nav-item <?= is_active('home') ? 'active' : '' ?>">
-                        <a href="/index.php" class="nav-link">Home</a>
+                        <a href="<?= url('index.php') ?>" class="nav-link">Home</a>
                     </li>
                     <li class="nav-item <?= is_active('about') ? 'active' : '' ?>">
-                        <a href="/about.php" class="nav-link">About Us</a>
+                        <a href="<?= url('about.php') ?>" class="nav-link">About Us</a>
                     </li>
                     
                     <!-- Trading with Dynamic Subpages Dropdown -->
                     <li class="nav-item has-dropdown <?= is_category_active('trading') ? 'active' : '' ?>">
-                        <a href="/trading.php" class="nav-link">
-                            Trading <span class="dropdown-arrow">▼</span>
+                        <a href="<?= url('trading.php') ?>" class="nav-link">
+                            Trading <span class="arrow-down">▾</span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="/trading.php" class="dropdown-item"><strong>All Trading Overview</strong></a></li>
-                            <?php foreach ($tradingPages as $tp): ?>
+                            <li><a href="<?= url('trading.php') ?>" class="dropdown-item"><strong>All Trading Overview</strong></a></li>
+                            <?php foreach ($tradingSubpages as $tp): ?>
                                 <li>
-                                    <a href="/page.php?slug=<?= e($tp['slug']) ?>" class="dropdown-item">
+                                    <a href="<?= url('page.php?slug=' . urlencode($tp['slug'])) ?>" class="dropdown-item">
                                         <?= e($tp['title']) ?>
                                     </a>
                                 </li>
@@ -92,14 +91,14 @@ $pageMetaDesc = $pageMetaDesc ?? 'Global Connect - Reliable partner for internat
 
                     <!-- Finance with Dynamic Subpages Dropdown -->
                     <li class="nav-item has-dropdown <?= is_category_active('finance') ? 'active' : '' ?>">
-                        <a href="/finance.php" class="nav-link">
-                            Finance <span class="dropdown-arrow">▼</span>
+                        <a href="<?= url('finance.php') ?>" class="nav-link">
+                            Finance <span class="arrow-down">▾</span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="/finance.php" class="dropdown-item"><strong>All Finance Overview</strong></a></li>
-                            <?php foreach ($financePages as $fp): ?>
+                            <li><a href="<?= url('finance.php') ?>" class="dropdown-item"><strong>All Finance Overview</strong></a></li>
+                            <?php foreach ($financeSubpages as $fp): ?>
                                 <li>
-                                    <a href="/page.php?slug=<?= e($fp['slug']) ?>" class="dropdown-item">
+                                    <a href="<?= url('page.php?slug=' . urlencode($fp['slug'])) ?>" class="dropdown-item">
                                         <?= e($fp['title']) ?>
                                     </a>
                                 </li>
@@ -108,23 +107,23 @@ $pageMetaDesc = $pageMetaDesc ?? 'Global Connect - Reliable partner for internat
                     </li>
 
                     <li class="nav-item <?= is_active('consulting') ? 'active' : '' ?>">
-                        <a href="/consulting.php" class="nav-link">Consulting</a>
+                        <a href="<?= url('consulting.php') ?>" class="nav-link">Consulting</a>
                     </li>
-
+                    
                     <li class="nav-item <?= is_active('contact') ? 'active' : '' ?>">
-                        <a href="/contact.php" class="nav-link">Contact</a>
+                        <a href="<?= url('contact.php') ?>" class="nav-link">Contact</a>
                     </li>
                 </ul>
+
+                <!-- Mobile Hamburger Button -->
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Navigation Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <!-- Header CTA Button -->
+                <a href="<?= url('contact.php') ?>" class="btn-header-cta">Get in Touch →</a>
             </nav>
-
-            <!-- Header Action CTA -->
-            <div class="header-action">
-                <a href="/contact.php" class="btn-header-cta">Get in Touch →</a>
-            </div>
-
-            <!-- Mobile Hamburger Toggle -->
-            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Navigation Menu">
-                ☰
-            </button>
         </div>
     </header>
