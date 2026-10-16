@@ -22,7 +22,6 @@ function base_url(string $path = ''): string {
     static $base = null;
     if ($base === null) {
         $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-        $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
         $dir = str_replace('\\', '/', dirname($scriptName));
         
         // Remove /admin or /includes if running from subdirectories
@@ -79,6 +78,35 @@ function image_url(string $filename = ''): string {
  */
 function admin_url(string $path = ''): string {
     return base_url('admin/' . ltrim($path, '/'));
+}
+
+/**
+ * Check if current page is active
+ */
+function is_active(string $name): bool {
+    $script = basename($_SERVER['SCRIPT_NAME'] ?? '', '.php');
+    if ($name === 'home' && ($script === 'index' || empty($script))) {
+        return true;
+    }
+    return $script === $name;
+}
+
+/**
+ * Check if category is active
+ */
+function is_category_active(string $cat): bool {
+    $script = basename($_SERVER['SCRIPT_NAME'] ?? '', '.php');
+    if ($script === $cat) {
+        return true;
+    }
+    if ($script === 'page') {
+        $slug = $_GET['slug'] ?? '';
+        if ($slug) {
+            $page = get_page_by_slug($slug);
+            return ($page['category_slug'] ?? '') === $cat;
+        }
+    }
+    return false;
 }
 
 /**
