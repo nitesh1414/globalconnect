@@ -13,7 +13,7 @@ $currentUser = current_user();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?></title>
-    <link rel="icon" type="image/svg+xml" href="<?= image_url('logo.svg') ?>">
+    <link rel="icon" type="image/png" href="<?= image_url('logo-design-gcv.png') ?>">
     <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/editor.css') ?>">
 </head>

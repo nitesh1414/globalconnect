@@ -11,7 +11,7 @@ $phoneSg = get_setting('header_phone_sg', '(65) 89451100');
 $phoneRoam = get_setting('header_phone_roam', '(91) 99100 02299');
 $emailPrimary = get_setting('contact_email_primary', 'admin@globalconnectsg.com');
 $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg.com');
-$logoUrl = get_setting('logo_url', 'logo.svg');
+$logoUrl = get_setting('logo_url', 'logo-design-gcv.png');
 
 // Dynamic subpages for dropdown menus
 $tradingSubpages = get_pages_by_category('trading');
@@ -24,7 +24,7 @@ $financeSubpages = get_pages_by_category('finance');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle ?? $siteTitle) ?></title>
     <meta name="description" content="<?= e($pageMetaDesc ?? 'We are a global business enterprise headquartered in Singapore And India. Reliable partner for international trade services, trade finance, and financial advisory.') ?>">
-    <link rel="icon" type="image/svg+xml" href="<?= image_url('logo.svg') ?>">
+    <link rel="icon" type="image/png" href="<?= image_url('logo-design-gcv.png') ?>">
     <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 </head>
 <body>
@@ -57,9 +57,13 @@ $financeSubpages = get_pages_by_category('finance');
     <!-- Main Navigation Header -->
     <header class="site-header">
         <div class="header-container">
-            <!-- Brand Logo -->
+            <!-- Brand Logo with Emblem & Logo Text -->
             <a href="<?= url('index.php') ?>" class="site-logo" title="<?= e($siteTitle) ?>">
-                <img src="<?= image_url($logoUrl) ?>" alt="<?= e($siteName) ?> Logo" width="220" height="52">
+                <img src="<?= image_url('logo-design-gcv.png') ?>" alt="GCV Logo" class="site-logo-img" width="50" height="50">
+                <div class="site-logo-text">
+                    <span class="site-logo-title">GLOBAL <span>CONNECT</span></span>
+                    <span class="site-logo-tagline">Ventures &bull; Singapore &bull; India</span>
+                </div>
             </a>
 
             <!-- Navigation Bar -->

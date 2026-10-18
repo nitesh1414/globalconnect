@@ -55,15 +55,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login | Global Connect CMS</title>
-    <link rel="icon" type="image/svg+xml" href="<?= image_url('logo.svg') ?>">
+    <link rel="icon" type="image/png" href="<?= image_url('logo-design-gcv.png') ?>">
     <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
 </head>
 <body class="login-body">
     <div class="login-card">
         <div class="login-header">
-            <img src="<?= image_url('logo.svg') ?>" alt="Global Connect">
-            <h2>Administration Panel</h2>
-            <p>Enter your credentials to manage Global Connect CMS</p>
+            <img src="<?= image_url('logo-design-gcv.png') ?>" alt="GCV Logo">
+            <h2 style="font-size: 22px; margin-bottom: 4px;">GLOBAL <span style="color: var(--admin-primary);">CONNECT</span></h2>
+            <p style="font-weight: 600; color: var(--admin-gold); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Administration Portal</p>
+            <p style="font-size: 13px; color: var(--admin-text-muted);">Enter your credentials to manage Global Connect CMS</p>
         </div>
 
         <?php if ($errorMsg): ?>

@@ -15,16 +15,38 @@ const PORT = process.env.PORT || 3000;
 const DOC_ROOT = '/var/www/html';
 const WORKSPACE_DIR = __dirname;
 
-// Create uploads and data directories if they don't exist
+// Create uploads directory if it does not exist
 if (!fs.existsSync(path.join(WORKSPACE_DIR, 'uploads'))) {
   fs.mkdirSync(path.join(WORKSPACE_DIR, 'uploads'), { recursive: true });
-}
-if (!fs.existsSync(path.join(WORKSPACE_DIR, 'data'))) {
-  fs.mkdirSync(path.join(WORKSPACE_DIR, 'data'), { recursive: true });
 }
 
 let php;
 let requestHandler;
+
+// Static file search helper
+function findStaticFile(requestedPath) {
+  const cleanPath = requestedPath.split('?')[0];
+  const filename = path.basename(cleanPath);
+
+  // Candidate paths to check
+  const candidates = [
+    path.join(WORKSPACE_DIR, cleanPath),
+    path.join(WORKSPACE_DIR, cleanPath.replace(/^\/(?:mysite|globalconnect)\//, '/')),
+    path.join(WORKSPACE_DIR, 'assets', cleanPath.replace(/^(\/)?assets\//, '')),
+    path.join(WORKSPACE_DIR, 'assets/css', filename),
+    path.join(WORKSPACE_DIR, 'assets/js', filename),
+    path.join(WORKSPACE_DIR, 'assets/images', filename),
+    path.join(WORKSPACE_DIR, 'uploads', filename),
+    path.join(WORKSPACE_DIR, filename)
+  ];
+
+  for (const cand of candidates) {
+    if (fs.existsSync(cand) && fs.statSync(cand).isFile()) {
+      return cand;
+    }
+  }
+  return null;
+}
 
 async function initPHP() {
   const origCwd = process.cwd();
@@ -39,6 +61,14 @@ async function initPHP() {
   php.mkdirTree(DOC_ROOT);
   php.mount(DOC_ROOT, createNodeFsMountHandler(WORKSPACE_DIR));
 
+  // Mount virtual subdirectories for simulated subfolders
+  try {
+    php.mkdirTree(`${DOC_ROOT}/mysite`);
+    php.mount(`${DOC_ROOT}/mysite`, createNodeFsMountHandler(WORKSPACE_DIR));
+    php.mkdirTree(`${DOC_ROOT}/globalconnect`);
+    php.mount(`${DOC_ROOT}/globalconnect`, createNodeFsMountHandler(WORKSPACE_DIR));
+  } catch (e) {}
+
   requestHandler = new PHPRequestHandler({
     php,
     documentRoot: DOC_ROOT,
@@ -50,24 +80,24 @@ async function initPHP() {
 
 app.use(cookieParser());
 
-// Static file serving for assets and uploads
-app.use('/assets', express.static(path.join(WORKSPACE_DIR, 'assets')));
-app.use('/uploads', express.static(path.join(WORKSPACE_DIR, 'uploads')));
-
-// Middleware to capture request body and handle direct static files
+// Robust static asset middleware with universal fallback
 app.use((req, res, next) => {
-  const ext = path.extname(req.path).toLowerCase();
-  const staticExts = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.webp'];
-  
-  if (staticExts.includes(ext)) {
-    const filePath = path.join(WORKSPACE_DIR, req.path);
-    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-      const mimeType = mime.lookup(filePath) || 'application/octet-stream';
+  const cleanUrl = req.path.split('?')[0];
+  const ext = path.extname(cleanUrl).toLowerCase();
+  const staticExts = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2', '.ttf', '.webp', '.map'];
+
+  if (staticExts.includes(ext) || cleanUrl.includes('/assets/') || cleanUrl.includes('/uploads/')) {
+    const foundPath = findStaticFile(cleanUrl);
+    if (foundPath) {
+      const mimeType = mime.lookup(foundPath) || 'application/octet-stream';
       res.setHeader('Content-Type', mimeType);
-      return fs.createReadStream(filePath).pipe(res);
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      return fs.createReadStream(foundPath).pipe(res);
     }
   }
 
+  // Capture body for POST/PUT requests
   const chunks = [];
   req.on('data', chunk => chunks.push(chunk));
   req.on('end', () => {
@@ -127,24 +157,29 @@ app.use(async (req, res) => {
     res.status(phpResponse.httpStatusCode || 200);
 
     if (phpResponse.bytes) {
-      res.end(Buffer.from(phpResponse.bytes));
+      return res.send(Buffer.from(phpResponse.bytes));
+    } else if (phpResponse.text) {
+      return res.send(phpResponse.text);
     } else {
-      res.end(phpResponse.text || '');
+      return res.end();
     }
   } catch (err) {
-    console.error('PHP Request Error:', err);
-    res.status(500).send(`<h1>Server Error</h1><pre>${err.message}\n${err.stack}</pre>`);
+    console.error('PHP execution error:', err);
+    res.status(500).send(`
+      <div style="font-family: sans-serif; padding: 30px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; color: #9f1239;">
+        <h2>PHP Execution Error</h2>
+        <pre style="white-space: pre-wrap; font-size: 13px;">${err.stack || err.message}</pre>
+      </div>
+    `);
   }
 });
 
-async function start() {
-  await initPHP();
+// Start Server
+initPHP().then(() => {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Global Connect Web Server running at http://0.0.0.0:${PORT}`);
   });
-}
-
-start().catch(err => {
-  console.error('Startup failed:', err);
+}).catch(err => {
+  console.error('Failed to initialize PHP runtime:', err);
   process.exit(1);
 });

@@ -15,7 +15,7 @@ $categoryParam = $_GET['category'] ?? '';
 ?>
 <aside class="admin-sidebar">
     <div class="sidebar-header">
-        <img src="<?= image_url('logo.svg') ?>" alt="Global Connect">
+        <img src="<?= image_url('logo-design-gcv.png') ?>" alt="GCV Logo">
         <div class="sidebar-brand-text">GLOBAL <span>CONNECT</span> CMS</div>
     </div>
 

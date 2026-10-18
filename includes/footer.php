@@ -11,7 +11,13 @@ $financeFooterPages = get_pages_by_category('finance');
         <div class="footer-container">
             <!-- Col 1: About & Registered Offices -->
             <div class="footer-col">
-                <div class="footer-logo">GLOBAL <span>CONNECT</span></div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+                    <img src="<?= image_url('logo-design-gcv.png') ?>" alt="GCV Logo" style="height: 48px; width: 48px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--accent-gold); background: #000000; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                    <div>
+                        <div class="footer-logo" style="margin-bottom: 0;">GLOBAL <span>CONNECT</span></div>
+                        <small style="color: var(--accent-gold); font-size: 11px; letter-spacing: 1px; font-weight: 600; text-transform: uppercase;">Ventures &bull; Singapore &bull; India</small>
+                    </div>
+                </div>
                 <p class="footer-desc">
                     Global Connect is a premier international trade facilitator and financial structuring partner headquartered in Singapore and India, operating across Southeast Asia and global commodity hubs.
                 </p>
