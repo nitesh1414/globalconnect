@@ -5,9 +5,11 @@
 $db = get_db();
 $unreadInquiries = 0;
 $totalPages = 0;
+$totalSlides = 0;
 try {
     $unreadInquiries = $db->query("SELECT COUNT(*) FROM contacts WHERE status = 'unread'")->fetchColumn();
     $totalPages = $db->query("SELECT COUNT(*) FROM pages")->fetchColumn();
+    $totalSlides = $db->query("SELECT COUNT(*) FROM hero_slides")->fetchColumn();
 } catch (Exception $e) {}
 
 $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
@@ -31,6 +33,16 @@ $categoryParam = $_GET['category'] ?? '';
         </li>
 
         <li class="sidebar-heading">Content Management</li>
+        <li class="sidebar-item <?= in_array($currentScript, ['sliders.php', 'slider-add.php', 'slider-edit.php']) ? 'active' : '' ?>">
+            <a href="<?= admin_url('sliders.php') ?>" class="sidebar-link">
+                <div class="sidebar-link-content">
+                    <span class="sidebar-link-icon">🏙</span>
+                    <span>Hero Banners</span>
+                </div>
+                <span class="sidebar-badge" style="background: rgba(255,255,255,0.15); color: #fff;"><?= $totalSlides ?></span>
+            </a>
+        </li>
+
         <li class="sidebar-item <?= ($currentScript === 'pages.php' && empty($categoryParam)) ? 'active' : '' ?>">
             <a href="<?= admin_url('pages.php') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">
@@ -77,7 +89,7 @@ $categoryParam = $_GET['category'] ?? '';
             </a>
         </li>
 
-        <li class="sidebar-heading">Inquiries & Leads</li>
+        <li class="sidebar-heading">Inquiries &amp; Leads</li>
         <li class="sidebar-item <?= $currentScript === 'contacts.php' ? 'active' : '' ?>">
             <a href="<?= admin_url('contacts.php') ?>" class="sidebar-link">
                 <div class="sidebar-link-content">

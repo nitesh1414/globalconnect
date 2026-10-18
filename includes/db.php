@@ -80,6 +80,35 @@ class Database {
                     $sql = file_get_contents($sqlFile);
                     $db->exec($sql);
                 }
+            } else {
+                // Ensure hero_slides table exists
+                $stmt2 = $db->query("SHOW TABLES LIKE 'hero_slides'");
+                if (!$stmt2->fetch()) {
+                    $db->exec("
+                        CREATE TABLE IF NOT EXISTS `hero_slides` (
+                          `id` INT AUTO_INCREMENT PRIMARY KEY,
+                          `title` VARCHAR(255) NULL,
+                          `subtitle` TEXT NULL,
+                          `badge_text` VARCHAR(100) NULL,
+                          `image_path` VARCHAR(255) NOT NULL,
+                          `button_text` VARCHAR(100) NULL,
+                          `button_link` VARCHAR(255) NULL,
+                          `secondary_button_text` VARCHAR(100) NULL,
+                          `secondary_button_link` VARCHAR(255) NULL,
+                          `show_text_overlay` TINYINT(1) DEFAULT 0,
+                          `status` ENUM('active', 'inactive') DEFAULT 'active',
+                          `sort_order` INT DEFAULT 0,
+                          `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+                          `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                    ");
+                    $db->exec("
+                        INSERT INTO `hero_slides` (`id`, `title`, `subtitle`, `badge_text`, `image_path`, `button_text`, `button_link`, `secondary_button_text`, `secondary_button_link`, `show_text_overlay`, `status`, `sort_order`) VALUES
+                        (1, 'Global Connect Group of Companies', 'Singapore • India • Indonesia • Hongkong | Sourcing, Supply Chain & Financial Structuring', 'Singapore • India • Global Network', 'assets/images/global-connect-banner-1.png', 'Explore Trading', 'trading.php', 'Trade Finance', 'finance.php', 0, 'active', 1),
+                        (2, 'Your Strategic Partner in Sourcing & Supply Chain', 'We are a global business enterprise headquartered in Singapore and India. At Global Connect, we believe in building meaningful partnerships that drive success across international borders.', 'Singapore • India • Global Network', 'assets/images/banner-hero-1.png', 'Explore Trading', 'trading.php', 'Trade Finance', 'finance.php', 1, 'active', 2)
+                        ON DUPLICATE KEY UPDATE `image_path`=`image_path`;
+                    ");
+                }
             }
         } catch (Exception $e) {
             error_log("Schema ensure error: " . $e->getMessage());
@@ -131,6 +160,23 @@ class Database {
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
+            CREATE TABLE IF NOT EXISTS hero_slides (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT,
+                subtitle TEXT,
+                badge_text TEXT,
+                image_path TEXT NOT NULL,
+                button_text TEXT,
+                button_link TEXT,
+                secondary_button_text TEXT,
+                secondary_button_link TEXT,
+                show_text_overlay INTEGER DEFAULT 0,
+                status TEXT DEFAULT 'active',
+                sort_order INTEGER DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
             CREATE TABLE IF NOT EXISTS settings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 setting_key TEXT UNIQUE NOT NULL,
@@ -161,6 +207,43 @@ class Database {
             );
         ");
 
+        // Seed Hero Slides if empty
+        $slideCount = $db->query("SELECT COUNT(*) FROM hero_slides")->fetchColumn();
+        if ($slideCount == 0) {
+            $slideStmt = $db->prepare("
+                INSERT INTO hero_slides (id, title, subtitle, badge_text, image_path, button_text, button_link, secondary_button_text, secondary_button_link, show_text_overlay, status, sort_order)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $slideStmt->execute([
+                1,
+                'Global Connect Group of Companies',
+                'Singapore • India • Indonesia • Hongkong | Sourcing, Supply Chain & Financial Structuring',
+                'Singapore • India • Global Network',
+                'assets/images/global-connect-banner-1.png',
+                'Explore Trading',
+                'trading.php',
+                'Trade Finance',
+                'finance.php',
+                0, // Clean mode (no text overlay on image)
+                'active',
+                1
+            ]);
+            $slideStmt->execute([
+                2,
+                'Your Strategic Partner in Sourcing & Supply Chain',
+                'We are a global business enterprise headquartered in Singapore and India. At Global Connect, we believe in building meaningful partnerships that drive success across international borders.',
+                'Singapore • India • Global Network',
+                'assets/images/banner-hero-1.png',
+                'Explore Trading',
+                'trading.php',
+                'Trade Finance',
+                'finance.php',
+                1, // With text overlay
+                'active',
+                2
+            ]);
+        }
+
         $cnt = $db->query("SELECT COUNT(*) FROM pages")->fetchColumn();
         if ($cnt == 0) {
             // Admin user
@@ -187,65 +270,71 @@ class Database {
                 ['site_tagline', 'Your Strategic Partner in Sourcing & Supply Chain Management'],
                 ['contact_email', 'admin@globalconnectsg.com'],
                 ['contact_phone', '(65) 89451100'],
-                ['office_address', '195 Jalan Besar, #03-01, Singapore 208883'],
+                ['address_sg', '101 KITCHENER ROAD #03-43 JALAN BESAR PLAZA SINGAPORE (208511)'],
+                ['address_india', 'NO. 211 RAJNIGANDHA BLOCK, GARDEN APARTMENT, 21 VITTHAL MALLYA ROAD (opp. UB CITY) BANGLORE 560001 INDIA'],
+                ['address_branches', 'New Delhi, Mumbai, Hyderabad and Chennai (By Appointment ONLY – IN HYATT GROUP OF HOTELS)'],
+                ['address_indonesia', 'HOTEL GRAND HYATT PLAZA, JL. M.H. THAMRIN KAV. 28-30, GONDANGDIA, MENTENG, JAKARTA, 10350, INDONESIA'],
+                ['address_hongkong', 'HOTEL HYATT REGENCY 18 HANOI ROAD TSIM SHA TSU KOWLOON HONGKONG'],
                 ['stat_partners', '3,600+'],
                 ['stat_countries', '19+'],
                 ['stat_banks', '19+'],
-                ['stat_experience', '25+ Years'],
-                ['company_reg', '201931818H']
+                ['logo_url', '/assets/images/logo-design-gcv.png'],
+                ['banner_url', '/assets/images/global-connect-banner-1.png'],
+                ['footer_about', 'At Global Connect, we believe in building meaningful partnerships that drive success across borders. With our expertise and network, we connect businesses to new markets and lasting opportunities.']
             ];
+
             $setStmt = $db->prepare("INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)");
             foreach ($settings as $s) {
                 $setStmt->execute($s);
             }
 
-            // Seed CMS pages
+            // Default Pages for CMS
             $pages = [
                 [
-                    2, 'Copper Cathodes', 'copper-cathodes',
-                    'Grade A 99.99% Electrolytic Copper Cathodes',
-                    'Copper Cathodes Trading & Sourcing',
-                    'Global supply of premium copper cathodes meeting international standards with guaranteed purity.',
+                    2, 'Copper Cathodes (Grade A)', 'copper-cathodes',
+                    'Grade A 99.99% Electrolytic Copper Cathodes (LME Non-Registered)',
+                    'Non-Ferrous Metals & Minerals',
+                    'Direct allocation and contract sourcing of electrolytic copper cathodes from compliant smelters globally.',
                     'minerals-metals.jpg',
-                    'High purity Non-LME and LME grade copper cathodes sourced from certified refineries across Africa, South America, and Central Asia.',
-                    '<h2>Electrolytic Copper Cathodes (Grade A 99.99%)</h2><p>Global Connect facilitates the structured supply of premium Electrolytic Copper Cathodes (Grade A, Non-LME &amp; LME registered brands). Sourced from Tier-1 refineries across Zambia, DR Congo, Chile, and Kazakhstan, our copper products satisfy rigid international manufacturing benchmarks.</p><h3>Key Specifications</h3><table class=\"table\"><thead><tr><th>Parameter</th><th>Specification</th></tr></thead><tbody><tr><td>Purity (Cu)</td><td>99.99% Minimum (ASTM B115-00)</td></tr><tr><td>Dimensions</td><td>914mm x 914mm x 12mm (approx.)</td></tr><tr><td>Weight per Sheet</td><td>125 kg (+/- 1%)</td></tr><tr><td>Packaging</td><td>Palletized bundles banded with steel straps</td></tr><tr><td>Inspection</td><td>SGS / Alex Stewart International at loading port</td></tr></tbody></table><h3>Commercial &amp; Trade Terms</h3><p>We structure spot and long-term annual supply contracts with flexible financial instruments including Irrevocable Confirmed Letters of Credit (DLC / SBLC / MT700) and Escrow facilities.</p>',
+                    'Grade A Electrolytic Copper Cathodes with 99.99% purity (LME Non-Registered) conforming to BS EN 1978:1998 (Cu-ETP-1).',
+                    '<h2>Copper Cathodes Sourcing &amp; Allocation</h2><p>Global Connect facilitates the global physical trading of electrolytic Copper Cathodes (Cu purity 99.99%). Our direct access to Tier-1 mining houses, bonded warehouses, and African / South American supply corridors enables seamless allocation for industrial clients worldwide.</p><h3>Key Specifications</h3><ul><li><strong>Purity:</strong> 99.99% Minimum (Conforms to ASTM B115-00 / LME Grade A)</li><li><strong>Form:</strong> Rectangular sheet cathodes (~125 kg per sheet)</li><li><strong>Packaging:</strong> Palletized in steel strapped bundles (~2.5 MT per bundle)</li><li><strong>Delivery Terms:</strong> CIF, CFR, or FOB to designated world ports with SGS / Alex Stewart inspection.</li></ul>',
                     1
                 ],
                 [
-                    2, 'Sugar ICUMSA 45', 'sugar-icumsa-45',
-                    'Refined White Cane Sugar ICUMSA 45 from Brazil & Thailand',
-                    'Sugar ICUMSA 45 Sourcing',
-                    'Top-tier refined white cane sugar suitable for human consumption and industrial food production.',
+                    2, 'Sugar (ICUMSA 45 & Raw Cane)', 'sugar-icumsa-45',
+                    'Refined White Cane Sugar ICUMSA 45 & VHP Raw Sugar',
+                    'Soft Commodities & Agricultural Products',
+                    'High volume refined sugar allocations originating from prime Brazilian and Indian sugar mills.',
                     'sugar-trade.jpg',
-                    'High-grade refined white cane sugar ICUMSA 45 sourced directly from major Brazilian and Thai sugar mills with prompt bulk shipping.',
-                    '<h2>Refined White Cane Sugar - ICUMSA 45</h2><p>Global Connect is a leading sourcing channel for 100% refined white cane sugar ICUMSA 45, sourced directly from verified Brazilian and Thai mills for global port delivery (CIF/FOB).</p><h3>Technical Specifications</h3><table class=\"table\"><thead><tr><th>Property</th><th>Standard</th></tr></thead><tbody><tr><td>Polarization</td><td>99.80% Minimum at 20°C</td></tr><tr><td>ICUMSA Color</td><td>45 RBU Maximum (ICUMSA Method No. 4/1978)</td></tr><tr><td>Moisture</td><td>0.04% Maximum</td></tr><tr><td>Ash Content</td><td>0.04% Maximum</td></tr><tr><td>Solubility</td><td>100% Dry and Free Flowing</td></tr><tr><td>Radiation</td><td>Normal / Non-radioactive</td></tr></tbody></table><h3>Shipping &amp; Logistics</h3><p>Supplied in 50 kg polypropylene bags or bulk breakbulk vessels. Inspected by SGS prior to dispatch.</p>',
+                    'Brazilian ICUMSA 45 refined white sugar and raw cane sugar supplied via bulk vessel loads and containerized lots with full SGS certification.',
+                    '<h2>Refined White Sugar ICUMSA 45</h2><p>As one of the world’s most demanding soft commodity supply chains, Global Connect works directly with certified Brazilian and Indian sugar mills and top-tier trading houses to deliver refined and raw sugar with guaranteed origin documentation and quality inspections.</p><h3>Product Specifications</h3><ul><li><strong>Polarization:</strong> 99.80% Minimum</li><li><strong>ICUMSA Rating:</strong> ICUMSA 45 RBU (Refined White Sugar)</li><li><strong>Moisture:</strong> 0.04% Maximum</li><li><strong>Ash Content:</strong> 0.04% Maximum</li><li><strong>Solubility:</strong> 100% Dry and Free Flowing</li><li><strong>Origin:</strong> Brazil (Santos/Paranaguá) or India</li></ul>',
                     2
                 ],
                 [
-                    2, 'HMS 1 & 2 Scrap Metal', 'scrap-metal-hms',
-                    'Heavy Melting Steel Scrap (HMS 1 / HMS 2 - 80:20 Ratio)',
-                    'Ferrous Scrap Sourcing',
-                    'Premium grade heavy melting steel scrap for industrial steel smelting and recycling.',
+                    2, 'Scrap Metal & Heavy Melting Steel (HMS 1/2)', 'scrap-metal-hms',
+                    'Ferrous Scrap Metals: HMS 1, HMS 2 & Used Rails (R50/R65)',
+                    'Ferrous Metals & Recycling',
+                    'Consolidated yard sourcing and containerized shipment of premium ferrous scrap for steel manufacturers.',
                     'minerals-metals.jpg',
-                    'Quality ferrous scrap ISRI 200-206 compliant heavy melting steel scrap sourced from ship breaking yards and industrial decommissioning projects.',
-                    '<h2>Heavy Melting Steel (HMS 1 &amp; 2 - 80:20)</h2><p>We source clean, non-radioactive heavy melting steel scrap according to ISRI 200-206 guidelines, perfectly suited for electric arc furnace (EAF) and induction furnace steel plants globally.</p><h3>Specification Standards</h3><ul><li><strong>HMS 1 (ISRI 200):</strong> Clean wrought iron and steel scrap, minimum thickness 1/4 inch (6mm).</li><li><strong>HMS 2 (ISRI 201-206):</strong> Cut steel scrap, minimum thickness 1/8 inch (3mm).</li><li><strong>Blend Ratio:</strong> 80% HMS 1 : 20% HMS 2.</li><li><strong>Impurity Level:</strong> Less than 0.5% non-metallic residuals.</li></ul>',
+                    'HMS 1/2 (80:20 ratio), shredded steel scrap (ISRI 211), and used rail scrap strictly compliant with ISRI quality standards.',
+                    '<h2>Ferrous Scrap Metal &amp; Steel Supplies</h2><p>Global Connect supplies industrial steel mills and re-rolling facilities with high grade ferrous scrap. All cargo is surveyed by certified international inspection agencies (SGS, CCIC, Bureau Veritas) prior to shipment to ensure zero radiation and absence of hazardous materials.</p><h3>Grades Supplied</h3><ul><li><strong>HMS 1 &amp; 2 (ISRI 200-206):</strong> Standard 80:20 blend with clean thickness profiles.</li><li><strong>Used Rails (R50 - R65):</strong> Cut to specified 1.0m / 1.5m lengths for re-melting or re-rolling.</li><li><strong>Shredded Steel Scrap (ISRI 211):</strong> High density homogenous ferrous feed.</li></ul>',
                     3
                 ],
                 [
-                    2, 'Coal & Thermal Energy', 'coal-energy',
-                    'Steam Coal, Anthracite & Coking Coal',
-                    'Thermal Energy Commodities',
-                    'High calorific value Indonesian and Australian steam coal for power generation and industrial applications.',
-                    'petroleum-lubricants.jpg',
-                    'Direct supply of high-grade Indonesian and Australian thermal coal with customized GCV specifications (3800 - 6500 kcal/kg).',
-                    '<h2>Thermal Coal &amp; Metallurgical Coking Coal</h2><p>Global Connect partners with concession owners and major coal miners in Indonesia (Kalimantan, Sumatra) and Australia to supply coal for thermal power utilities and cement plants worldwide.</p><h3>Calorific Grades</h3><table class=\"table\"><thead><tr><th>Grade</th><th>Gross Calorific Value (GCV - ARB)</th><th>Total Moisture</th></tr></thead><tbody><tr><td>Low-Rank</td><td>3,800 - 4,200 kcal/kg</td><td>32% - 38%</td></tr><tr><td>Mid-Rank</td><td>4,800 - 5,200 kcal/kg</td><td>22% - 28%</td></tr><tr><td>High-Rank</td><td>5,800 - 6,500 kcal/kg</td><td>12% - 16%</td></tr></tbody></table>',
+                    2, 'Coal & Thermal Energy Commodities', 'coal-energy',
+                    'Steam Coal (GAR 3800 - GAR 6000) & Met Coke',
+                    'Energy & Thermal Commodities',
+                    'Bulk vessel allocations of Indonesian and Australian thermal coal for power utilities and industrial boilers.',
+                    'gas-oil.jpg',
+                    'High calorific value Indonesian thermal coal (GAR 4200 to 5800 kcal/kg) with low sulfur and moisture content.',
+                    '<h2>Thermal Coal &amp; Energy Commodities</h2><p>We supply thermal power utilities, cement plants, and metallurgical processing units with reliable coal shipments sourced directly from licensed mining concessions in Kalimantan (Indonesia) and Australia.</p><h3>Coal Specifications</h3><ul><li><strong>GAR 3800 - 4200:</strong> High volatile, low ash coal for coastal power plants.</li><li><strong>GAR 5000 - 5800:</strong> High energy thermal coal with superior burn efficiency.</li><li><strong>Moisture &amp; Ash:</strong> Strictly controlled to international utility standards.</li><li><strong>Vessel Loading:</strong> Handymax, Supramax, and Panamax chartering.</li></ul>',
                     4
                 ],
                 [
                     2, 'Palm Oil & Edible Oils', 'palm-oil-edible-oils',
-                    'Crude Palm Oil (CPO), RBD Palm Olein (CP8, CP10) & Sunflower Oil',
-                    'Edible Oils Trading',
-                    'Bulk edible oils for commercial food manufacturing, frying, and biodiesel refinement.',
+                    'RBD Palm Olein (CP8/CP10), Crude Palm Oil (CPO) & Sunflower Oil',
+                    'Agro Commodities & Edible Oils',
+                    'Bulk and packaged shipments of premium refined edible vegetable oils from Southeast Asian refineries.',
                     'agro-products.jpg',
                     'Certified sustainably sourced palm oil and derivatives from premier Southeast Asian plantations with international RSPO compliance.',
                     '<h2>Palm Oil Products &amp; Edible Vegetable Oils</h2><p>From Crude Palm Oil (CPO) to Refined Bleached Deodorized (RBD) Palm Olein (CP8 / CP10) and cooking oils, Global Connect manages bulk liquid vessel shipments directly from Malaysian and Indonesian ports.</p><h3>Product Range</h3><ul><li><strong>RBD Palm Olein (CP8 / CP10):</strong> Premium liquid fraction for food service and retail packaging.</li><li><strong>Crude Palm Oil (CPO):</strong> Standard industrial feedstock with FFA &lt; 5%.</li><li><strong>Refined Sunflower Oil:</strong> 100% pure refined sunflower oil for European and Middle Eastern markets.</li></ul>',

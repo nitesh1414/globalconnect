@@ -21,7 +21,6 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Default Admin User: admin / admin123
--- Hash for 'admin123': $2y$10$wL4FpSsyfM26vK90jZt4j.nO9Q0F/mIvh2aTjA1sM.Xk1f6d3RkKG
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `full_name`, `role`) VALUES
 (1, 'admin', '$2y$10$o8kU13i95O3Qyv2kHZZQ9u3wS2vXN7t2b6pE0gL1n9f7j3c4d5e6a', 'admin@globalconnectsg.com', 'Admin User', 'admin')
 ON DUPLICATE KEY UPDATE `username`=`username`;
@@ -73,6 +72,32 @@ CREATE TABLE IF NOT EXISTS `pages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- -------------------------------------------------------
+-- Table: hero_slides (Hero Section Banners & Sliders)
+-- -------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `hero_slides` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `title` VARCHAR(255) NULL,
+  `subtitle` TEXT NULL,
+  `badge_text` VARCHAR(100) NULL,
+  `image_path` VARCHAR(255) NOT NULL,
+  `button_text` VARCHAR(100) NULL,
+  `button_link` VARCHAR(255) NULL,
+  `secondary_button_text` VARCHAR(100) NULL,
+  `secondary_button_link` VARCHAR(255) NULL,
+  `show_text_overlay` TINYINT(1) DEFAULT 0,
+  `status` ENUM('active', 'inactive') DEFAULT 'active',
+  `sort_order` INT DEFAULT 0,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Seed Default Hero Slides
+INSERT INTO `hero_slides` (`id`, `title`, `subtitle`, `badge_text`, `image_path`, `button_text`, `button_link`, `secondary_button_text`, `secondary_button_link`, `show_text_overlay`, `status`, `sort_order`) VALUES
+(1, 'Global Connect Group of Companies', 'Singapore • India • Indonesia • Hongkong | Sourcing, Supply Chain & Financial Structuring', 'Singapore • India • Global Network', 'assets/images/global-connect-banner-1.png', 'Explore Trading', 'trading.php', 'Trade Finance', 'finance.php', 0, 'active', 1),
+(2, 'Your Strategic Partner in Sourcing & Supply Chain', 'We are a global business enterprise headquartered in Singapore and India. At Global Connect, we believe in building meaningful partnerships that drive success across international borders.', 'Singapore • India • Global Network', 'assets/images/banner-hero-1.png', 'Explore Trading', 'trading.php', 'Trade Finance', 'finance.php', 1, 'active', 2)
+ON DUPLICATE KEY UPDATE `image_path`=`image_path`;
+
+-- -------------------------------------------------------
 -- Table: settings
 -- -------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `settings` (
@@ -101,7 +126,7 @@ INSERT INTO `settings` (`setting_key`, `setting_value`) VALUES
 ('stat_partners', '3,600+'),
 ('stat_countries', '19+'),
 ('stat_banks', '19+'),
-('logo_url', '/assets/images/logo.svg'),
+('logo_url', '/assets/images/logo-design-gcv.png'),
 ('banner_url', '/assets/images/global-connect-banner-1.png'),
 ('footer_about', 'At Global Connect, we believe in building meaningful partnerships that drive success across borders. With our expertise and network, we connect businesses to new markets and lasting opportunities.')
 ON DUPLICATE KEY UPDATE `setting_value`=`setting_value`;

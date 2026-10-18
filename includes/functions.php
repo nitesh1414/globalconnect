@@ -362,3 +362,37 @@ function upload_image(array $file): ?string {
 
     return null;
 }
+
+/**
+ * Get Hero Slides
+ */
+function get_hero_slides(bool $onlyActive = true): array {
+    try {
+        $db = get_db();
+        $sql = "SELECT * FROM hero_slides";
+        if ($onlyActive) {
+            $sql .= " WHERE status = 'active'";
+        }
+        $sql .= " ORDER BY sort_order ASC, id ASC";
+        $stmt = $db->query($sql);
+        return $stmt->fetchAll() ?: [];
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Get Single Hero Slide by ID
+ */
+function get_hero_slide_by_id(int $id): ?array {
+    try {
+        $db = get_db();
+        $stmt = $db->prepare("SELECT * FROM hero_slides WHERE id = ? LIMIT 1");
+        $stmt->execute([$id]);
+        $slide = $stmt->fetch();
+        return $slide ?: null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+

@@ -6,25 +6,95 @@ $pageTitle = 'Global Connect | Global Business Enterprise Headquartered in Singa
 $pageMetaDesc = 'We are a global business enterprise headquartered in Singapore And India. Reliable partner for international trade services, trade finance, and financial advisory.';
 
 require_once __DIR__ . '/includes/header.php';
+
+// Fetch active hero slides from database
+$heroSlides = get_hero_slides(true);
+if (empty($heroSlides)) {
+    // Default fallback slide with the uploaded banner
+    $heroSlides = [
+        [
+            'id' => 1,
+            'title' => 'Global Connect Group of Companies',
+            'subtitle' => 'Singapore • India • Indonesia • Hongkong | Sourcing, Supply Chain & Financial Structuring',
+            'badge_text' => 'Singapore • India • Global Network',
+            'image_path' => 'assets/images/global-connect-banner-1.png',
+            'button_text' => 'Explore Trading',
+            'button_link' => 'trading.php',
+            'secondary_button_text' => 'Trade Finance',
+            'secondary_button_link' => 'finance.php',
+            'show_text_overlay' => 0,
+            'status' => 'active'
+        ]
+    ];
+}
 ?>
 
-<!-- Hero Section with Background & Visuals -->
-<section class="hero-section">
-    <div class="container hero-content">
-        <span class="hero-badge">Singapore &bull; India &bull; Global Network</span>
-        <h1 class="hero-title">
-            Your Strategic Partner in Sourcing &amp; Supply Chain Management
-        </h1>
-        <p class="hero-subtitle">
-            We are a global business enterprise headquartered in Singapore and India. At Global Connect, we believe in building meaningful partnerships that drive success across international borders.
-        </p>
-        <div class="hero-actions">
-            <a href="<?= url('trading.php') ?>" class="btn-primary">Explore Trading</a>
-            <a href="<?= url('finance.php') ?>" class="btn-gold">Trade Finance</a>
-            <a href="<?= url('contact.php') ?>" class="btn-outline-white">Contact Us</a>
+<!-- Dynamic Hero Slider Section (Clean Image Graphic & Text Overlay modes) -->
+<section class="hero-slider-section" id="heroSlider" data-slide-count="<?= count($heroSlides) ?>">
+    <div class="hero-slider-track">
+        <?php foreach ($heroSlides as $idx => $slide): ?>
+            <div class="hero-slide-item <?= $idx === 0 ? 'active' : '' ?> <?= $slide['show_text_overlay'] ? 'slide-has-overlay' : 'slide-clean-graphic' ?>" data-slide-index="<?= $idx ?>">
+                <?php if ($slide['show_text_overlay']): ?>
+                    <!-- Slide With Text Overlay Mode -->
+                    <div class="hero-slide-bg" style="background-image: url('<?= image_url($slide['image_path']) ?>');">
+                        <div class="hero-overlay-backdrop"></div>
+                        <div class="hero-overlay-grid"></div>
+                        <div class="container hero-content">
+                            <?php if (!empty($slide['badge_text'])): ?>
+                                <span class="hero-badge"><?= e($slide['badge_text']) ?></span>
+                            <?php endif; ?>
+                            <h1 class="hero-title"><?= e($slide['title']) ?></h1>
+                            <?php if (!empty($slide['subtitle'])): ?>
+                                <p class="hero-subtitle"><?= nl2br(e($slide['subtitle'])) ?></p>
+                            <?php endif; ?>
+                            <div class="hero-actions">
+                                <?php if (!empty($slide['button_text']) && !empty($slide['button_link'])): ?>
+                                    <a href="<?= url($slide['button_link']) ?>" class="btn-primary"><?= e($slide['button_text']) ?></a>
+                                <?php endif; ?>
+                                <?php if (!empty($slide['secondary_button_text']) && !empty($slide['secondary_button_link'])): ?>
+                                    <a href="<?= url($slide['secondary_button_link']) ?>" class="btn-gold"><?= e($slide['secondary_button_text']) ?></a>
+                                <?php endif; ?>
+                                <a href="<?= url('contact.php') ?>" class="btn-outline-white">Contact Us</a>
+                            </div>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <!-- Slide Clean Graphic Mode (Full image completely visible on all devices) -->
+                    <div class="hero-clean-wrapper">
+                        <img src="<?= image_url($slide['image_path']) ?>" alt="<?= e($slide['title'] ?: 'Global Connect Group of Companies') ?>" class="hero-clean-banner-img" loading="<?= $idx === 0 ? 'eager' : 'lazy' ?>">
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <?php if (count($heroSlides) > 1): ?>
+        <!-- Slider Navigation Controls -->
+        <button type="button" class="hero-nav-btn hero-nav-prev" aria-label="Previous Slide">&#10094;</button>
+        <button type="button" class="hero-nav-btn hero-nav-next" aria-label="Next Slide">&#10095;</button>
+        
+        <div class="hero-dots-container">
+            <?php foreach ($heroSlides as $idx => $slide): ?>
+                <button type="button" class="hero-dot <?= $idx === 0 ? 'active' : '' ?>" data-slide-to="<?= $idx ?>" aria-label="Slide <?= $idx + 1 ?>"></button>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</section>
+
+<!-- Quick Action Strip -->
+<div class="hero-quick-bar">
+    <div class="container hero-quick-grid">
+        <div class="hero-quick-tagline">
+            <span>🌐</span>
+            <span>Headquartered in <strong>Singapore</strong> &amp; <strong>India</strong> &bull; Presence in <strong>Indonesia</strong> &amp; <strong>Hong Kong</strong></span>
+        </div>
+        <div class="hero-quick-links">
+            <a href="<?= url('trading.php') ?>" class="hero-quick-btn hero-quick-btn-primary">Explore Trading</a>
+            <a href="<?= url('finance.php') ?>" class="hero-quick-btn hero-quick-btn-gold">Trade Finance</a>
+            <a href="<?= url('contact.php') ?>" class="hero-quick-btn hero-quick-btn-outline">Contact Us</a>
         </div>
     </div>
-</section>
+</div>
 
 <!-- Key Stats Counter Bar -->
 <section class="stats-section">
@@ -107,9 +177,9 @@ require_once __DIR__ . '/includes/header.php';
                     <img src="<?= image_url('finance-home.jpg') ?>" alt="Trade Finance" loading="lazy">
                 </div>
                 <div class="service-card-body">
-                    <h3 class="service-card-title">Finance Solutions</h3>
+                    <h3 class="service-card-title">Trade Finance</h3>
                     <p class="service-card-text">
-                        Partnering with leading global institutions to provide Trade Finance (Standby LC, Transferable LC, Documentary LC), Corporate Banking, and International Trade Advisory.
+                        Providing comprehensive international trade finance, letters of credit (LC / SBLC), bank guarantees, structured working capital, and specialized transaction support.
                     </p>
                     <a href="<?= url('finance.php') ?>" class="service-card-link">Read More +</a>
                 </div>
@@ -118,12 +188,12 @@ require_once __DIR__ . '/includes/header.php';
             <!-- Service 3: Consulting -->
             <div class="service-card">
                 <div class="service-card-image">
-                    <img src="<?= image_url('consulting-home.jpg') ?>" alt="Corporate Consulting" loading="lazy">
+                    <img src="<?= image_url('consulting-home.jpg') ?>" alt="Financial Consulting" loading="lazy">
                 </div>
                 <div class="service-card-body">
-                    <h3 class="service-card-title">Corporate Consulting</h3>
+                    <h3 class="service-card-title">Financial Advisory</h3>
                     <p class="service-card-text">
-                        High quality Financial Advisory services and capital market solutions: Financial Structuring, M&amp;A, Offshore Fund Raising, Unlocking Values, and Debt Syndication.
+                        Strategic financial engineering, project financing, debt syndication, mergers &amp; acquisitions, and cross-border investment advisory across emerging markets.
                     </p>
                     <a href="<?= url('consulting.php') ?>" class="service-card-link">Read More +</a>
                 </div>
@@ -132,109 +202,57 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 </section>
 
-<!-- Singapore Financial Hub Advantages -->
+<!-- Singapore Advantage Section -->
 <section class="section">
     <div class="container">
-        <div class="section-header">
-            <span class="section-subtitle">Jurisdictional Strength</span>
-            <h2 class="section-title">Why Singapore is the Global Trade &amp; Financial Hub</h2>
-            <p class="section-lead">
-                Singapore consistently ranks among the world’s most competitive economies, offering an unparalleled ecosystem for trade and investment.
-            </p>
-        </div>
-
-        <div class="hub-grid">
-            <div class="hub-card">
-                <div class="hub-icon">🏛</div>
-                <h3 class="hub-card-title">Top Financial Hub</h3>
-                <p class="hub-card-text">
-                    Ranked among the top financial centres globally, offering deep capital markets, leading international banks, and robust liquidity access.
-                </p>
+        <div class="about-grid">
+            <div class="about-image-wrapper">
+                <img src="<?= image_url('international-trade-finance.jpg') ?>" alt="Singapore Financial Center" class="img-fluid" width="560" height="340">
             </div>
-
-            <div class="hub-card">
-                <div class="hub-icon">⚖</div>
-                <h3 class="hub-card-title">Rule of Law &amp; Governance</h3>
-                <p class="hub-card-text">
-                    Transparent, trusted legal framework with strong intellectual property protection and highly respected international arbitration courts.
+            <div>
+                <span class="section-subtitle">Global Connectivity</span>
+                <h2 class="section-title">Singapore – The World’s Premier Financial &amp; Trade Hub</h2>
+                <p class="section-lead">
+                    Strategically headquartered in Singapore with direct operational corridors into India, Southeast Asia, and global markets.
                 </p>
-            </div>
-
-            <div class="hub-card">
-                <div class="hub-icon">🎓</div>
-                <h3 class="hub-card-title">Educated &amp; Global Workforce</h3>
-                <p class="hub-card-text">
-                    A world-class talent pool with extensive experience across cross-border trade, quantitative finance, and international compliance.
-                </p>
-            </div>
-
-            <div class="hub-card">
-                <div class="hub-icon">💵</div>
-                <h3 class="hub-card-title">Currency &amp; Monetary Stability</h3>
-                <p class="hub-card-text">
-                    The Singapore Dollar (SGD) is backed by solid fiscal management under the Monetary Authority of Singapore (MAS), ensuring stability.
-                </p>
-            </div>
-
-            <div class="hub-card">
-                <div class="hub-icon">✈</div>
-                <h3 class="hub-card-title">Global Connectivity</h3>
-                <p class="hub-card-text">
-                    Strategic geographic location with direct flights to over 400 cities and timezone alignment connecting Western and Asian business days.
-                </p>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">🏛</div>
+                        <div>
+                            <h4 class="feature-title">Top 3 Global Financial Center</h4>
+                            <p class="feature-desc">Ranked among the leading financial capitals globally, supported by robust regulatory frameworks and transparent legal systems.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🛡</div>
+                        <div>
+                            <h4 class="feature-title">AAA Sovereign Credit Rating</h4>
+                            <p class="feature-desc">Exceptional macroeconomic stability, political neutrality, and strong capital reserves providing complete safety for international transactions.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">⚡</div>
+                        <div>
+                            <h4 class="feature-title">Extensive Treaty &amp; Banking Network</h4>
+                            <p class="feature-desc">Over 20+ Free Trade Agreements and 19+ partner banking institutions facilitating swift capital and goods movements.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- FDI Singapore to India Analysis -->
-<section class="section section-light">
-    <div class="container">
-        <div class="fdi-box">
-            <div class="section-header" style="text-align: left; margin-bottom: 30px;">
-                <span class="section-subtitle">Economic Corridor Insights</span>
-                <h2 class="section-title">Singapore Remains the Leading Source of FDI into India</h2>
-                <p class="section-lead" style="margin-left: 0;">
-                    Singapore maintained its position as the top source of Foreign Direct Investment (FDI) equity inflows into India, contributing <strong>$15 billion (approx. ₹1.24 lakh crore)</strong> in the 2024–25 fiscal year.
-                </p>
-            </div>
-
-            <div class="fdi-grid">
-                <div class="fdi-stat-card">
-                    <span class="fdi-number">$15.0 Billion</span>
-                    <span class="fdi-desc">Direct Equity Inflow from Singapore in 2024–25</span>
-                </div>
-                <div class="fdi-stat-card">
-                    <span class="fdi-number">+14% Growth</span>
-                    <span class="fdi-desc">Increase in Overall FDI Inflows to India ($81.04B Total)</span>
-                </div>
-                <div class="fdi-stat-card">
-                    <span class="fdi-number">1st Rank</span>
-                    <span class="fdi-desc">Singapore Ranks as India's #1 Global Investment Partner</span>
-                </div>
-            </div>
-
-            <div style="margin-top: 30px; background: #ffffff; padding: 25px; border-radius: var(--radius-md); border-left: 4px solid var(--accent-gold);">
-                <h4 style="margin-bottom: 10px; color: var(--primary-color);">Industry Expert Analysis</h4>
-                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 10px;">
-                    <em>"Singapore's sustained position as India's leading FDI contributor reflects the deep structural trust and comprehensive economic partnership between both nations. Global Connect leverages this vital corridor to facilitate trade structuring, fund raising, and cross-border ventures."</em>
-                </p>
-                <small style="color: var(--secondary-color); font-weight: 600;">— Economic Insights Desk, Global Connect Singapore</small>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Call to Action Banner -->
-<section class="cta-section">
-    <div class="container text-center">
-        <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 15px;">Ready to Structure Your Next Global Trade or Project?</h2>
-        <p style="max-width: 680px; margin: 0 auto 30px; font-size: 16px; opacity: 0.9;">
-            Connect directly with our specialized trade finance desks in Singapore and India. We provide prioritized assistance and customized execution.
+<!-- Call to Action Section -->
+<section class="section-cta">
+    <div class="container cta-content">
+        <h2 class="cta-title">Ready to Expand Your Global Trade &amp; Capital Reach?</h2>
+        <p class="cta-lead">
+            Partner with Global Connect for seamless sourcing, commodity allocations, and structured trade finance solutions tailored to your business needs.
         </p>
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-            <a href="<?= url('contact.php') ?>" class="btn-gold" style="padding: 14px 32px; font-size: 16px;">Initiate Trade Enquiry →</a>
-            <a href="tel:+6589451100" class="btn-outline-white" style="padding: 14px 32px; font-size: 16px;">Call Singapore: (65) 89451100</a>
+            <a href="<?= url('contact.php') ?>" class="btn-gold" style="font-size: 16px; padding: 14px 32px;">Schedule an Executive Consultation</a>
+            <a href="<?= url('trading.php') ?>" class="btn-outline-white" style="font-size: 16px; padding: 14px 28px;">Explore Product Portfolio</a>
         </div>
     </div>
 </section>

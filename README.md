@@ -35,6 +35,12 @@ A complete, modern, and mobile-responsive Multi-Page CMS developed in **Core PHP
 ---
 
 ### 2. Powerful Admin Panel CMS (`/admin/`)
+- **Hero Banners & Sliders Manager (`/admin/sliders.php`, `/admin/slider-add.php`, `/admin/slider-edit.php`)**:
+  - Add, edit, reorder, and activate/deactivate homepage hero slides.
+  - **Dual Display Modes**:
+    - **Clean Image Mode (Without text on image)**: Designed specifically for infographic world map banners (such as the Global Connect Group banner). Renders the full image with 100% complete visibility and zero cropping across desktop, tablet, and mobile devices (preserving all country lines, registration UEN/GSTN/BR numbers, and GCV emblem).
+    - **Text Overlay Mode (With text on image)**: Adds customizable badge tag, headline, subtitle description, and dual CTA action buttons floating over high-resolution corporate backgrounds with high-contrast gradient backdrop.
+  - **Interactive Multi-Slide Carousel**: Automatically activates when multiple active slides exist, featuring touch-swipe gestures, navigation arrows, pagination bullets, and autoplay rotation.
 - **Dashboard (`/admin/index.php`)**:
   - Live KPI metrics: Total Pages, Trading Pages count, Finance Pages count, Inquiries count, and Unread alerts.
   - Quick action shortcuts for instant page creation and inbox access.
