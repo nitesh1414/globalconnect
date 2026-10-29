@@ -1,9 +1,25 @@
 /**
- * Global Connect - Main Public JavaScript
+ * Global Connect - Main Interactive JavaScript
+ * Animations, Scroll Reveals, Live Counters, Hero Slider & Navigation
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Mobile Hamburger Menu Toggle
+
+  // 1. Sticky Header Glassmorphic Effect
+  const siteHeader = document.getElementById('siteHeader');
+  function updateHeaderScroll() {
+    if (siteHeader) {
+      if (window.scrollY > 30) {
+        siteHeader.classList.add('scrolled');
+      } else {
+        siteHeader.classList.remove('scrolled');
+      }
+    }
+  }
+  window.addEventListener('scroll', updateHeaderScroll, { passive: true });
+  updateHeaderScroll();
+
+  // 2. Mobile Hamburger Menu Toggle
   const mobileToggle = document.getElementById('mobileToggle');
   const navMenu = document.getElementById('navMenu');
 
@@ -25,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownItems = navMenu.querySelectorAll('.nav-item.has-dropdown');
     dropdownItems.forEach((item) => {
       const link = item.querySelector('.nav-link');
-      if (link && window.innerWidth <= 768) {
+      if (link) {
         link.addEventListener('click', (e) => {
           if (window.innerWidth <= 768) {
             e.preventDefault();
@@ -36,7 +52,80 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Hero Slider Carousel
+  // 3. Scroll Reveal Animation Engine (IntersectionObserver)
+  const revealElements = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-scale');
+  if ('IntersectionObserver' in window && revealElements.length > 0) {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      root: null,
+      threshold: 0.12,
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+  } else {
+    // Fallback for older browsers
+    revealElements.forEach(el => el.classList.add('is-revealed'));
+  }
+
+  // 4. Smooth Number Counter Animation
+  const countUpElements = document.querySelectorAll('.count-up');
+  if (countUpElements.length > 0) {
+    function animateCountUp(el) {
+      const rawVal = el.getAttribute('data-value') || el.innerText;
+      const cleanVal = rawVal.replace(/[^0-9]/g, '');
+      const targetNum = parseInt(cleanVal, 10);
+      if (isNaN(targetNum)) return;
+
+      const prefix = rawVal.match(/^[^\d]*/) ? rawVal.match(/^[^\d]*/)[0] : '';
+      const suffix = rawVal.match(/[^\d]*$/) ? rawVal.match(/[^\d]*$/)[0] : '';
+      const duration = 1800; // ms
+      const startTime = performance.now();
+
+      function updateCounter(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Easing out cubic
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        const currentVal = Math.floor(easeProgress * targetNum);
+
+        // Format with commas if target >= 1000
+        const formatted = (targetNum >= 1000) ? currentVal.toLocaleString() : currentVal.toString();
+        el.innerText = prefix + formatted + suffix;
+
+        if (progress < 1) {
+          requestAnimationFrame(updateCounter);
+        } else {
+          el.innerText = rawVal;
+        }
+      }
+
+      requestAnimationFrame(updateCounter);
+    }
+
+    if ('IntersectionObserver' in window) {
+      const counterObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateCountUp(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      countUpElements.forEach(el => counterObserver.observe(el));
+    } else {
+      countUpElements.forEach(el => animateCountUp(el));
+    }
+  }
+
+  // 5. Hero Slider Carousel
   const heroSlider = document.getElementById('heroSlider');
   if (heroSlider) {
     const slides = heroSlider.querySelectorAll('.hero-slide-item');
@@ -130,15 +219,48 @@ document.addEventListener('DOMContentLoaded', () => {
       startAutoPlay();
     }, { passive: true });
 
-    // Pause on hover
     heroSlider.addEventListener('mouseenter', stopAutoPlay);
     heroSlider.addEventListener('mouseleave', startAutoPlay);
 
-    // Start auto-rotation if multiple slides exist
     startAutoPlay();
   }
 
-  // Auto-dismiss alert boxes after 5 seconds
+  // 6. Floating Back to Top Button with Scroll Progress
+  const backToTopBtn = document.getElementById('backToTop');
+  const progressCircle = document.getElementById('progressCircle');
+
+  if (backToTopBtn) {
+    const totalCircumference = 2 * Math.PI * 21; // ~131.95
+
+    function updateBackToTop() {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) : 0;
+
+      if (scrollTop > 280) {
+        backToTopBtn.classList.add('show');
+      } else {
+        backToTopBtn.classList.remove('show');
+      }
+
+      if (progressCircle) {
+        const offset = totalCircumference - (scrollPercent * totalCircumference);
+        progressCircle.style.strokeDashoffset = Math.max(0, offset);
+      }
+    }
+
+    window.addEventListener('scroll', updateBackToTop, { passive: true });
+    updateBackToTop();
+
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+
+  // 7. Auto-dismiss alert boxes after 5 seconds
   const alerts = document.querySelectorAll('.alert');
   alerts.forEach(alert => {
     setTimeout(() => {

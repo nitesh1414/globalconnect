@@ -165,6 +165,33 @@ function get_setting(string $key, string $default = ''): string {
 }
 
 /**
+ * Set setting value in database (Universal UPSERT)
+ */
+function set_setting(string $key, string $value): bool {
+    try {
+        $db = get_db();
+        $driver = Database::getDriver();
+        if ($driver === 'sqlite') {
+            $stmt = $db->prepare("INSERT INTO settings (setting_key, setting_value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT(setting_key) DO UPDATE SET setting_value = excluded.setting_value, updated_at = CURRENT_TIMESTAMP");
+            return $stmt->execute([$key, $value]);
+        } else {
+            $stmt = $db->prepare("INSERT INTO settings (setting_key, setting_value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = CURRENT_TIMESTAMP");
+            return $stmt->execute([$key, $value]);
+        }
+    } catch (Exception $e) {
+        try {
+            $del = $db->prepare("DELETE FROM settings WHERE setting_key = ?");
+            $del->execute([$key]);
+            $ins = $db->prepare("INSERT INTO settings (setting_key, setting_value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)");
+            return $ins->execute([$key, $value]);
+        } catch (Exception $ex) {
+            return false;
+        }
+    }
+}
+
+
+/**
  * Get single page by slug
  */
 function get_page_by_slug(string $slug): ?array {

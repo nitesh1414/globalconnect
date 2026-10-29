@@ -59,8 +59,11 @@ A complete, modern, and mobile-responsive Multi-Page CMS developed in **Core PHP
   - View all leads and contact messages submitted through the website.
   - Filter by Unread, Read, or Replied status.
   - Open inquiry details, reply via direct mailto link, mark as replied, or delete.
-- **Site Settings (`/admin/settings.php`)**:
-  - Manage company details, phone numbers (Singapore: `(65) 89451100`, Global Roaming: `(91) 99100 02299`), emails, headquarters addresses, homepage statistics counters, and footer summaries.
+- **Site Settings & Logo Manager (`/admin/settings.php`)**:
+  - **100% Dynamic Branding**: Direct file upload for website Logo, Favicon, and Experience images with instant live previews.
+  - **Editable Brand Typography**: Customize Logo Title (Part 1 & 2), Logo Subtitle Tagline, Browser Titles, and Meta Taglines.
+  - **Global Contact Directory**: Manage Singapore phone numbers, 24/7 Global Roaming lines, primary/secondary/tertiary emails, and 5 global office addresses (Singapore HQ, India Bangalore, Hyatt Hotel Branches, Jakarta Indonesia, Hong Kong).
+  - **Live Counters & Section Copy**: Edit all homepage statistics (Partners, Countries, Partner Banks, Years of Experience) and section copy (Philosophy, Capabilities, Singapore Hub, CTA banners) with instant frontend updates.
 - **Media Library (`/admin/media.php`)**:
   - Upload images (JPEG, PNG, SVG, WebP).
   - Browse existing asset library with one-click copy URL path.

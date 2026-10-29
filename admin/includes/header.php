@@ -6,6 +6,7 @@ require_once __DIR__ . '/auth.php';
 
 $pageTitle = $adminPageTitle ?? 'Admin Dashboard | Global Connect CMS';
 $currentUser = current_user();
+$siteFavicon = get_setting('site_favicon', get_setting('site_logo', 'logo-design-gcv.png'));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +14,7 @@ $currentUser = current_user();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?></title>
-    <link rel="icon" type="image/png" href="<?= image_url('logo-design-gcv.png') ?>">
+    <link rel="icon" type="image/png" href="<?= image_url($siteFavicon) ?>">
     <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/editor.css') ?>">
 </head>

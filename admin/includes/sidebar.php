@@ -14,11 +14,15 @@ try {
 
 $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
 $categoryParam = $_GET['category'] ?? '';
+
+$siteLogo = get_setting('site_logo', 'logo-design-gcv.png');
+$logoP1 = get_setting('logo_title_p1', 'GLOBAL');
+$logoP2 = get_setting('logo_title_p2', 'CONNECT');
 ?>
 <aside class="admin-sidebar">
     <div class="sidebar-header">
-        <img src="<?= image_url('logo-design-gcv.png') ?>" alt="GCV Logo">
-        <div class="sidebar-brand-text">GLOBAL <span>CONNECT</span> CMS</div>
+        <img src="<?= image_url($siteLogo) ?>" alt="GCV Logo">
+        <div class="sidebar-brand-text"><?= e($logoP1) ?> <span><?= e($logoP2) ?></span> CMS</div>
     </div>
 
     <ul class="sidebar-menu">

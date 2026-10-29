@@ -12,6 +12,7 @@ $tradingPagesCount = 0;
 $financePagesCount = 0;
 $totalInquiries = 0;
 $unreadInquiries = 0;
+$totalSlides = 0;
 $recentInquiries = [];
 $recentPages = [];
 
@@ -21,6 +22,7 @@ try {
     $financePagesCount = $db->query("SELECT COUNT(*) FROM pages WHERE category_id = (SELECT id FROM categories WHERE slug = 'finance')")->fetchColumn();
     $totalInquiries = $db->query("SELECT COUNT(*) FROM contacts")->fetchColumn();
     $unreadInquiries = $db->query("SELECT COUNT(*) FROM contacts WHERE status = 'unread'")->fetchColumn();
+    $totalSlides = $db->query("SELECT COUNT(*) FROM hero_slides")->fetchColumn();
 
     $recentInquiries = $db->query("SELECT * FROM contacts ORDER BY created_at DESC LIMIT 5")->fetchAll();
     $recentPages = $db->query("
@@ -65,6 +67,14 @@ require_once __DIR__ . '/includes/header.php';
 
     <div class="kpi-card">
         <div class="kpi-info">
+            <h4>Hero Banners</h4>
+            <div class="number"><?= $totalSlides ?></div>
+        </div>
+        <div class="kpi-icon icon-blue">🏙</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-info">
             <h4>Inquiries</h4>
             <div class="number"><?= $totalInquiries ?> <?= $unreadInquiries > 0 ? "<small style='font-size: 14px; color: var(--admin-danger);'>($unreadInquiries new)</small>" : "" ?></div>
         </div>
@@ -75,23 +85,23 @@ require_once __DIR__ . '/includes/header.php';
 <!-- Quick Action Shortcuts -->
 <div class="admin-card">
     <div class="admin-card-header">
-        <h3>Quick Content Actions</h3>
+        <h3>Quick Content &amp; Branding Actions</h3>
     </div>
     <div class="admin-card-body" style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="<?= admin_url('sliders.php') ?>" class="btn-admin-primary" style="background: #0369a1;">
+            <span>🏙</span> Manage Hero Banners
+        </a>
+        <a href="<?= admin_url('settings.php') ?>" class="btn-admin-primary" style="background: #b45309;">
+            <span>🌟</span> Upload Logo &amp; Settings
+        </a>
         <a href="<?= admin_url('page-add.php?category=trading') ?>" class="btn-admin-primary" style="background: #0284c7;">
-            <span>+</span> Add New Trading Page
+            <span>+</span> Add Trading Page
         </a>
         <a href="<?= admin_url('page-add.php?category=finance') ?>" class="btn-admin-primary" style="background: #16a34a;">
-            <span>+</span> Add New Finance Page
-        </a>
-        <a href="<?= admin_url('page-add.php') ?>" class="btn-admin-primary" style="background: #0f172a;">
-            <span>+</span> Add Custom Page
+            <span>+</span> Add Finance Page
         </a>
         <a href="<?= admin_url('contacts.php') ?>" class="btn-admin-primary" style="background: #d97706;">
-            <span>✉</span> View Contact Inquiries (<?= $unreadInquiries ?>)
-        </a>
-        <a href="<?= admin_url('settings.php') ?>" class="btn-admin-primary" style="background: #475569;">
-            <span>⚙</span> Update Site Settings
+            <span>✉</span> View Inquiries (<?= $unreadInquiries ?>)
         </a>
     </div>
 </div>
@@ -107,37 +117,38 @@ require_once __DIR__ . '/includes/header.php';
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th>Page Title</th>
+                        <th>Title</th>
                         <th>Category</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($recentPages as $rp): ?>
-                        <tr>
-                            <td>
-                                <strong><?= e($rp['title']) ?></strong>
-                                <small style="display: block; color: var(--admin-text-muted);"><?= e($rp['slug']) ?></small>
-                            </td>
-                            <td>
-                                <span style="font-weight: 600; color: var(--admin-primary);">
-                                    <?= e($rp['category_name'] ?: 'General') ?>
-                                </span>
-                            </td>
-                            <td>
-                                <span class="status-badge badge-<?= $rp['status'] === 'published' ? 'published' : 'draft' ?>">
-                                    <?= ucfirst($rp['status']) ?>
-                                </span>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <a href="<?= admin_url('page-edit.php?id=' . $rp['id']) ?>" class="btn-action btn-edit">Edit</a>
-                                    <a href="<?= url('page.php?slug=' . urlencode($rp['slug'])) ?>" target="_blank" class="btn-action btn-view">View</a>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
+                    <?php if (empty($recentPages)): ?>
+                        <tr><td colspan="4" style="text-align: center; color: var(--admin-text-muted); padding: 30px;">No pages found.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($recentPages as $p): ?>
+                            <tr>
+                                <td>
+                                    <strong style="color: var(--admin-text-dark);"><?= e($p['title']) ?></strong>
+                                    <div style="font-size: 12px; color: var(--admin-text-muted);">/<?= e($p['slug']) ?></div>
+                                </td>
+                                <td>
+                                    <span style="font-size: 12px; background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">
+                                        <?= e($p['category_name'] ?: 'General') ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge-status badge-<?= e($p['status']) ?>">
+                                        <?= ucfirst(e($p['status'])) ?>
+                                    </span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="<?= admin_url('page-edit.php?id=' . $p['id']) ?>" class="btn-action btn-edit">Edit</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -147,45 +158,35 @@ require_once __DIR__ . '/includes/header.php';
     <div class="admin-card">
         <div class="admin-card-header">
             <h3>Recent Inquiries</h3>
-            <a href="<?= admin_url('contacts.php') ?>" style="font-size: 13px; color: var(--admin-primary); font-weight: 600;">Inbox (<?= $totalInquiries ?>) →</a>
+            <a href="<?= admin_url('contacts.php') ?>" style="font-size: 13px; color: var(--admin-primary); font-weight: 600;">View All →</a>
         </div>
         <div class="admin-card-body" style="padding: 0;">
-            <?php if (!empty($recentInquiries)): ?>
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Contact</th>
-                            <th>Subject</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recentInquiries as $inq): ?>
-                            <tr>
-                                <td>
-                                    <strong><?= e($inq['name']) ?></strong>
-                                    <small style="display: block; color: var(--admin-text-muted);"><?= e($inq['email']) ?></small>
-                                </td>
-                                <td>
-                                    <span style="font-size: 13px;"><?= e(mb_strimwidth($inq['subject'] ?: $inq['message'], 0, 30, '...')) ?></span>
-                                </td>
-                                <td>
-                                    <span class="status-badge badge-<?= e($inq['status']) ?>">
-                                        <?= ucfirst($inq['status']) ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <a href="<?= admin_url('contacts.php?id=' . $inq['id']) ?>" class="btn-action btn-edit">Open</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
+            <?php if (empty($recentInquiries)): ?>
                 <div style="padding: 30px; text-align: center; color: var(--admin-text-muted);">
-                    No inquiries received yet.
+                    No contact inquiries received yet.
                 </div>
+            <?php else: ?>
+                <ul class="activity-feed">
+                    <?php foreach ($recentInquiries as $c): ?>
+                        <li class="activity-item">
+                            <div class="activity-icon" style="background: <?= $c['status'] === 'unread' ? '#fee2e2' : '#e0f2fe' ?>; color: <?= $c['status'] === 'unread' ? '#dc2626' : '#0284c7' ?>;">
+                                ✉
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">
+                                    <strong><?= e($c['name']) ?></strong> (<?= e($c['email']) ?>)
+                                    <?php if ($c['status'] === 'unread'): ?>
+                                        <span class="badge-status badge-draft" style="font-size: 10px; padding: 1px 6px;">NEW</span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="activity-desc" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;">
+                                    <?= e($c['subject'] ?: substr($c['message'], 0, 50)) ?>
+                                </div>
+                                <div class="activity-time"><?= date('M j, Y g:i A', strtotime($c['created_at'])) ?></div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
             <?php endif; ?>
         </div>
     </div>

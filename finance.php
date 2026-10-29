@@ -3,8 +3,10 @@
  * Global Connect - Finance Overview Page
  * Dynamically displays all Finance services/pages from DB
  */
-$pageTitle = 'Finance Solutions | Global Connect';
-$pageMetaDesc = 'Global Connect provides Trade Finance, Banking Support, SBLC, Letters of Credit, and Corporate Financial Advisory solutions.';
+require_once __DIR__ . '/includes/functions.php';
+
+$pageTitle = 'Finance | ' . get_setting('company_name', 'Global Connect');
+$pageMetaDesc = 'Comprehensive international trade finance, letters of credit (LC / SBLC), bank guarantees, structured working capital, and transaction support.';
 
 require_once __DIR__ . '/includes/header.php';
 
@@ -12,10 +14,10 @@ $financePages = get_pages_by_category('finance');
 ?>
 
 <!-- Page Banner -->
-<div class="page-banner">
+<div class="page-banner reveal-up">
     <div class="container">
-        <h1 class="page-banner-title">Finance Solutions</h1>
-        <p class="page-banner-subtitle">Trade Finance, Banking Support &amp; Advisory Solutions</p>
+        <h1 class="page-banner-title">Finance</h1>
+        <p class="page-banner-subtitle">Institutional trade banking, letter of credit structuring, and capital solutions</p>
         <div class="breadcrumb-nav">
             <a href="<?= url('index.php') ?>">Home</a> <span>/</span> <span>Finance</span>
         </div>
@@ -24,24 +26,25 @@ $financePages = get_pages_by_category('finance');
 
 <div class="page-content-wrapper">
     <div class="container">
-        <div class="section-header" style="text-align: left; max-width: 900px; margin-bottom: 40px;">
-            <span class="section-subtitle">Our Finance Capabilities</span>
+        <div class="section-header reveal-left" style="text-align: left; max-width: 900px; margin-bottom: 45px;">
+            <span class="section-subtitle">Our Financial Solutions</span>
             <h2 class="section-title">
-                We are Trade Finance Specialists offering various services in the Finance Domain all around the world.
+                Comprehensive Trade Finance, Banking Support &amp; Cross-Border Structuring
             </h2>
             <p class="section-lead">
-                Along with our global Partner Banks, we provide customized financial instruments with prioritized processing to facilitate international transactions securely and efficiently.
+                Leveraging relationships with top-tier international partner banks across Singapore, Hong Kong, London, and Zurich to provide credit enhancement, liquidity, and risk containment.
             </p>
         </div>
 
         <div class="services-grid">
             <?php if (!empty($financePages)): ?>
-                <?php foreach ($financePages as $p): ?>
-                    <div class="service-card">
+                <?php foreach ($financePages as $idx => $p): ?>
+                    <div class="service-card reveal-up hover-lift" style="transition-delay: <?= ($idx * 0.1) ?>s;">
                         <div class="service-card-image">
                             <a href="<?= url('page.php?slug=' . urlencode($p['slug'])) ?>">
                                 <img src="<?= image_url($p['featured_image'] ?: 'finance-home.jpg') ?>" alt="<?= e($p['title']) ?>" loading="lazy">
                             </a>
+                            <div class="service-badge badge-gold">Finance</div>
                         </div>
                         <div class="service-card-body">
                             <h3 class="service-card-title">
@@ -50,17 +53,18 @@ $financePages = get_pages_by_category('finance');
                                 </a>
                             </h3>
                             <p class="service-card-text">
-                                <?= e($p['summary'] ?: 'Comprehensive ' . $p['title'] . ' solutions engineered for corporate and institutional clients.') ?>
+                                <?= e($p['summary'] ?: 'Explore our ' . $p['title'] . ' structured finance solutions.') ?>
                             </p>
                             <a href="<?= url('page.php?slug=' . urlencode($p['slug'])) ?>" class="service-card-link">
-                                Read More +
+                                <span>Read More</span>
+                                <span class="link-arrow">+</span>
                             </a>
                         </div>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="col-12">
-                    <p class="text-muted">No finance services published yet.</p>
+                    <p class="text-muted">No finance solutions published yet.</p>
                 </div>
             <?php endif; ?>
         </div>

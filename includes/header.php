@@ -1,6 +1,6 @@
 <?php
 /**
- * Global Connect - Header Component
+ * Global Connect - Header Component (100% Dynamic from Admin Settings)
  */
 require_once __DIR__ . '/functions.php';
 
@@ -11,7 +11,13 @@ $phoneSg = get_setting('header_phone_sg', '(65) 89451100');
 $phoneRoam = get_setting('header_phone_roam', '(91) 99100 02299');
 $emailPrimary = get_setting('contact_email_primary', 'admin@globalconnectsg.com');
 $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg.com');
-$logoUrl = get_setting('logo_url', 'logo-design-gcv.png');
+
+// Dynamic Logo & Typography
+$siteLogo = get_setting('site_logo', 'logo-design-gcv.png');
+$logoP1 = get_setting('logo_title_p1', 'GLOBAL');
+$logoP2 = get_setting('logo_title_p2', 'CONNECT');
+$logoTagline = get_setting('logo_tagline', 'Ventures • Singapore • India');
+$siteFavicon = get_setting('site_favicon', $siteLogo);
 
 // Dynamic subpages for dropdown menus
 $tradingSubpages = get_pages_by_category('trading');
@@ -23,18 +29,18 @@ $financeSubpages = get_pages_by_category('finance');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle ?? $siteTitle) ?></title>
-    <meta name="description" content="<?= e($pageMetaDesc ?? 'We are a global business enterprise headquartered in Singapore And India. Reliable partner for international trade services, trade finance, and financial advisory.') ?>">
-    <link rel="icon" type="image/png" href="<?= image_url('logo-design-gcv.png') ?>">
+    <meta name="description" content="<?= e($pageMetaDesc ?? $siteTagline) ?>">
+    <link rel="icon" type="image/png" href="<?= image_url($siteFavicon) ?>">
     <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
 </head>
 <body>
 
-    <!-- Top Info Bar -->
+    <!-- Top Info Bar with animated pulses -->
     <div class="top-bar">
         <div class="top-bar-container">
             <div class="top-bar-left">
                 <div class="top-bar-item">
-                    <span class="tag">Singapore</span>
+                    <span class="tag tag-pulse">Singapore</span>
                     <a href="tel:<?= preg_replace('/[^0-9+]/', '', $phoneSg) ?>"><?= e($phoneSg) ?></a>
                 </div>
                 <div class="top-bar-item">
@@ -47,26 +53,30 @@ $financeSubpages = get_pages_by_category('finance');
                     <span>✉</span>
                     <a href="mailto:<?= e($emailPrimary) ?>"><?= e($emailPrimary) ?></a>
                 </div>
-                <div class="top-bar-item">
-                    <a href="mailto:<?= e($emailSecondary) ?>"><?= e($emailSecondary) ?></a>
-                </div>
+                <?php if (!empty($emailSecondary)): ?>
+                    <div class="top-bar-item">
+                        <a href="mailto:<?= e($emailSecondary) ?>"><?= e($emailSecondary) ?></a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
 
-    <!-- Main Navigation Header -->
-    <header class="site-header">
+    <!-- Main Navigation Header (Frosted Glass & Animated Reveal) -->
+    <header class="site-header" id="siteHeader">
         <div class="header-container">
-            <!-- Brand Logo with Emblem & Logo Text -->
+            <!-- Brand Logo with Dynamic Uploaded Emblem & Logo Text -->
             <a href="<?= url('index.php') ?>" class="site-logo" title="<?= e($siteTitle) ?>">
-                <img src="<?= image_url('logo-design-gcv.png') ?>" alt="GCV Logo" class="site-logo-img" width="50" height="50">
+                <div class="site-logo-img-wrapper">
+                    <img src="<?= image_url($siteLogo) ?>" alt="<?= e($siteName) ?> Logo" class="site-logo-img" width="50" height="50">
+                </div>
                 <div class="site-logo-text">
-                    <span class="site-logo-title">GLOBAL <span>CONNECT</span></span>
-                    <span class="site-logo-tagline">Ventures &bull; Singapore &bull; India</span>
+                    <span class="site-logo-title"><?= e($logoP1) ?> <span><?= e($logoP2) ?></span></span>
+                    <span class="site-logo-tagline"><?= e($logoTagline) ?></span>
                 </div>
             </a>
 
-            <!-- Navigation Bar -->
+            <!-- Navigation Bar with Micro-Animations -->
             <nav class="main-nav" aria-label="Main Navigation">
                 <ul class="nav-menu" id="navMenu">
                     <li class="nav-item <?= is_active('home') ? 'active' : '' ?>">
@@ -119,15 +129,19 @@ $financeSubpages = get_pages_by_category('finance');
                     </li>
                 </ul>
 
-                <!-- Mobile Hamburger Button -->
-                <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Navigation Menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                <div class="header-action">
+                    <a href="<?= url('contact.php') ?>" class="btn-quote shimmer-btn">
+                        <span>Get Consultation</span>
+                        <span class="btn-arrow">→</span>
+                    </a>
+                </div>
 
-                <!-- Header CTA Button -->
-                <a href="<?= url('contact.php') ?>" class="btn-header-cta">Get in Touch →</a>
+                <!-- Mobile Hamburger Toggle Button -->
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Navigation Menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
             </nav>
         </div>
     </header>

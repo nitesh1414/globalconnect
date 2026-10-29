@@ -9,6 +9,12 @@ if (is_logged_in()) {
     exit;
 }
 
+$siteLogo = get_setting('site_logo', 'logo-design-gcv.png');
+$logoP1 = get_setting('logo_title_p1', 'GLOBAL');
+$logoP2 = get_setting('logo_title_p2', 'CONNECT');
+$logoTagline = get_setting('logo_tagline', 'Ventures • Singapore • India');
+$siteFavicon = get_setting('site_favicon', $siteLogo);
+
 $errorMsg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -55,15 +61,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login | Global Connect CMS</title>
-    <link rel="icon" type="image/png" href="<?= image_url('logo-design-gcv.png') ?>">
+    <link rel="icon" type="image/png" href="<?= image_url($siteFavicon) ?>">
     <link rel="stylesheet" href="<?= asset('css/admin.css') ?>">
 </head>
 <body class="login-body">
     <div class="login-card">
         <div class="login-header">
-            <img src="<?= image_url('logo-design-gcv.png') ?>" alt="GCV Logo">
-            <h2 style="font-size: 22px; margin-bottom: 4px;">GLOBAL <span style="color: var(--admin-primary);">CONNECT</span></h2>
-            <p style="font-weight: 600; color: var(--admin-gold); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Administration Portal</p>
+            <img src="<?= image_url($siteLogo) ?>" alt="GCV Logo">
+            <h2 style="font-size: 22px; margin-bottom: 4px;"><?= e($logoP1) ?> <span style="color: var(--admin-primary);"><?= e($logoP2) ?></span></h2>
+            <p style="font-weight: 600; color: var(--admin-gold); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;"><?= e($logoTagline) ?></p>
             <p style="font-size: 13px; color: var(--admin-text-muted);">Enter your credentials to manage Global Connect CMS</p>
         </div>
 
