@@ -100,6 +100,35 @@ INSERT INTO `pages` (`id`, `category_id`, `title`, `slug`, `subtitle`, `banner_t
 ON DUPLICATE KEY UPDATE `content`=`content`;
 
 -- -------------------------------------------------------
+-- Table: executives (Leadership Team & Directors)
+-- -------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `executives` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(150) NOT NULL,
+  `role` VARCHAR(150) NOT NULL,
+  `email` VARCHAR(150) NOT NULL,
+  `phone` VARCHAR(50) DEFAULT '',
+  `location` VARCHAR(150) DEFAULT '',
+  `bio` TEXT NULL,
+  `avatar` VARCHAR(255) DEFAULT '',
+  `sort_order` INT DEFAULT 0,
+  `status` ENUM('active', 'inactive') DEFAULT 'active',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Seed authentic directors and executives
+INSERT INTO `executives` (`id`, `name`, `role`, `email`, `phone`, `location`, `avatar`, `sort_order`, `status`) VALUES
+(1, 'Mr Shammy Songra', 'Founder / Director', 'shammy@globalconnectsg.com', '(65) 89451100', 'Singapore / India', '', 1, 'active'),
+(2, 'Mr Cliff Poh', 'Director – Singapore', 'cliffpoh@globalconnectsg.com', '(65) 89451100', 'Singapore HQ', '', 2, 'active'),
+(3, 'Mr. Lima Hutama Halim', 'Director – Indonesia Business', 'limahalim@globalconnectsg.com', '', 'Jakarta, Indonesia', '', 3, 'active'),
+(4, 'Mr. Kapil Gulati', 'Director – International Business & Financial Advisory', 'kapil@globalconnectsg.com', '', 'Global Advisory Desk', '', 4, 'active'),
+(5, 'Mr Sandeep Pratap Sanap', 'Associate Director & Partner – India & International Business', 'sandeep@globalconnectsg.com', '(91) 99100 02299', 'India Corporate Office', '', 5, 'active'),
+(6, 'Mr. Siddharth Maheshwari', 'Director – Business Development', 'siddharth@globalconnectsg.com', '', 'Business Development Desk', '', 6, 'active'),
+(7, 'Mr. Amit Gupta', 'Director – Business Development', 'amit@globalconnectsg.com', '', 'Business Development Desk', '', 7, 'active')
+ON DUPLICATE KEY UPDATE `email`=`email`;
+
+-- -------------------------------------------------------
 -- Table: hero_slides (Hero Section Banners & Sliders)
 -- -------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hero_slides` (

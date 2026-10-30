@@ -55,51 +55,8 @@ $emailPrimary = get_setting('contact_email_primary', 'admin@globalconnectsg.com'
 $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg.com');
 $emailTertiary = get_setting('contact_email_tertiary', 'tsnshammy@gmail.com');
 
-// Executive Leadership Team
-$executives = [
-    [
-        'name' => 'Mr Shammy Songra',
-        'role' => 'Founder / Director',
-        'email' => 'shammy@globalconnectsg.com',
-        'location' => 'Singapore / India'
-    ],
-    [
-        'name' => 'Mr Cliff Poh',
-        'role' => 'Director – Singapore',
-        'email' => 'cliffpoh@globalconnectsg.com',
-        'location' => 'Singapore HQ'
-    ],
-    [
-        'name' => 'Mr. Lima Hutama Halim',
-        'role' => 'Director – Indonesia Business',
-        'email' => 'limahalim@globalconnectsg.com',
-        'location' => 'Jakarta, Indonesia'
-    ],
-    [
-        'name' => 'Mr. Kapil Gulati',
-        'role' => 'Director – International Business & Financial Advisory',
-        'email' => 'kapil@globalconnectsg.com',
-        'location' => 'Global Advisory Desk'
-    ],
-    [
-        'name' => 'Mr Sandeep Pratap Sanap',
-        'role' => 'Associate Director & Partner – India & International Business',
-        'email' => 'sandeep@globalconnectsg.com',
-        'location' => 'India Corporate Office'
-    ],
-    [
-        'name' => 'Mr. Siddharth Maheshwari',
-        'role' => 'Director – Business Development',
-        'email' => 'siddharth@globalconnectsg.com',
-        'location' => 'Business Development Desk'
-    ],
-    [
-        'name' => 'Mr. Amit Gupta',
-        'role' => 'Director – Business Development',
-        'email' => 'amit@globalconnectsg.com',
-        'location' => 'Business Development Desk'
-    ]
-];
+// Executive Leadership Team (Loaded dynamically from database)
+$executives = get_executives(true);
 ?>
 
 <!-- Page Banner -->
@@ -239,18 +196,39 @@ $executives = [
             </div>
 
             <div class="executive-grid">
-                <?php foreach ($executives as $idx => $exec): ?>
-                    <div class="executive-card hover-lift reveal-up" style="transition-delay: <?= ($idx * 0.08) ?>s;">
-                        <div class="exec-avatar">
-                            <?= strtoupper(substr($exec['name'], 3, 1)) ?>
-                        </div>
+                <?php foreach ($executives as $idx => $exec): 
+                    $cleanName = preg_replace('/^(Mr\.?|Ms\.?|Mrs\.?|Dr\.?)\s+/i', '', $exec['name']);
+                    $parts = preg_split('/\s+/', trim($cleanName));
+                    $initials = '';
+                    if (!empty($parts[0])) $initials .= mb_substr($parts[0], 0, 1);
+                    if (!empty($parts[1])) $initials .= mb_substr($parts[1], 0, 1);
+                    if (empty($initials)) $initials = mb_substr($exec['name'], 0, 2);
+                ?>
+                    <div class="executive-card hover-lift reveal-up" style="transition-delay: <?= ($idx * 0.06) ?>s;">
+                        <?php if (!empty($exec['avatar'])): ?>
+                            <img src="<?= e(image_url($exec['avatar'])) ?>" alt="<?= e($exec['name']) ?>" class="exec-avatar-img">
+                        <?php else: ?>
+                            <div class="exec-avatar">
+                                <?= e(strtoupper($initials)) ?>
+                            </div>
+                        <?php endif; ?>
                         <div class="exec-info">
                             <h4 class="exec-name"><?= e($exec['name']) ?></h4>
                             <p class="exec-role"><?= e($exec['role']) ?></p>
-                            <span class="exec-loc">📍 <?= e($exec['location']) ?></span>
+                            <?php if (!empty($exec['location'])): ?>
+                                <span class="exec-loc">📍 <?= e($exec['location']) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($exec['phone'])): ?>
+                                <a href="tel:<?= preg_replace('/[^0-9+]/', '', $exec['phone']) ?>" class="exec-phone">
+                                    <span>📞</span> <?= e($exec['phone']) ?>
+                                </a>
+                            <?php endif; ?>
                             <a href="mailto:<?= e($exec['email']) ?>" class="exec-email">
                                 <span>✉</span> <?= e($exec['email']) ?>
                             </a>
+                            <?php if (!empty($exec['bio'])): ?>
+                                <p class="exec-bio"><?= nl2br(e($exec['bio'])) ?></p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -360,7 +338,15 @@ $executives = [
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    font-size: 18px;
+    font-size: 16px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--accent-gold);
+}
+.exec-avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
     flex-shrink: 0;
     border: 1.5px solid var(--accent-gold);
 }
@@ -383,7 +369,25 @@ $executives = [
     display: block;
     font-size: 12px;
     color: #64748b;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+}
+.exec-phone {
+    display: block;
+    font-size: 12.5px;
+    color: #475569;
+    margin-bottom: 4px;
+    text-decoration: none;
+}
+.exec-phone:hover {
+    color: var(--secondary-color);
+}
+.exec-bio {
+    font-size: 12.5px;
+    color: #64748b;
+    margin-top: 8px;
+    line-height: 1.45;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 6px;
 }
 .exec-email {
     display: inline-flex;

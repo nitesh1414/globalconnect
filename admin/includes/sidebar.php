@@ -6,10 +6,12 @@ $db = get_db();
 $unreadInquiries = 0;
 $totalPages = 0;
 $totalSlides = 0;
+$totalExecs = 0;
 try {
     $unreadInquiries = $db->query("SELECT COUNT(*) FROM contacts WHERE status = 'unread'")->fetchColumn();
     $totalPages = $db->query("SELECT COUNT(*) FROM pages")->fetchColumn();
     $totalSlides = $db->query("SELECT COUNT(*) FROM hero_slides")->fetchColumn();
+    $totalExecs = $db->query("SELECT COUNT(*) FROM executives")->fetchColumn();
 } catch (Exception $e) {}
 
 $currentScript = basename($_SERVER['SCRIPT_NAME'] ?? '');
@@ -81,6 +83,16 @@ $logoP2 = get_setting('logo_title_p2', 'CONNECT');
                     <span class="sidebar-link-icon">📂</span>
                     <span>Categories</span>
                 </div>
+            </a>
+        </li>
+
+        <li class="sidebar-item <?= in_array($currentScript, ['executives.php', 'executive-add.php', 'executive-edit.php']) ? 'active' : '' ?>">
+            <a href="<?= admin_url('executives.php') ?>" class="sidebar-link">
+                <div class="sidebar-link-content">
+                    <span class="sidebar-link-icon">👥</span>
+                    <span>Executive Team</span>
+                </div>
+                <span class="sidebar-badge" style="background: rgba(255,255,255,0.15); color: #fff;"><?= $totalExecs ?></span>
             </a>
         </li>
 

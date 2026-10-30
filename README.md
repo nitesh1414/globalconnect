@@ -35,6 +35,11 @@ A complete, modern, and mobile-responsive Multi-Page CMS developed in **Core PHP
 ---
 
 ### 2. Powerful Admin Panel CMS (`/admin/`)
+- **Executive Leadership & Directors Manager (`/admin/executives.php`, `/admin/executive-add.php`, `/admin/executive-edit.php`)**:
+  - Full Add, Edit, Status Toggle, and Delete capability for Key Executive Contacts & Board of Directors.
+  - Fields supported: Full Name with Salutation, Corporate Role / Designation, Corporate Email, Direct / Roaming Phone, Office Desk / Location, Biography / Summary, Profile Avatar Photo Upload (with automatic monogram initial fallback), Sort Order sequence, and Display Status (Active / Inactive).
+  - Pre-seeded with all 7 authentic leadership records (Mr Shammy Songra, Mr Cliff Poh, Mr Lima Hutama Halim, Mr Kapil Gulati, Mr Sandeep Pratap Sanap, Mr Siddharth Maheshwari, Mr Amit Gupta).
+  - Fully dynamic rendering on public Contact Us page (`contact.php`) with responsive leadership grid, monogram avatars, direct click-to-call phone links, and mailto links.
 - **Hero Banners & Sliders Manager (`/admin/sliders.php`, `/admin/slider-add.php`, `/admin/slider-edit.php`)**:
   - Add, edit, reorder, and activate/deactivate homepage hero slides.
   - **Dual Display Modes**:
@@ -112,6 +117,14 @@ globalconnect/
 │   ├── page-add.php              # Add new page (Trading, Finance, Consulting, General)
 │   ├── page-edit.php             # Edit page with rich text editor & image uploader
 │   ├── page-delete.php           # Delete custom pages
+│   ├── sliders.php               # Hero banner list & status toggle
+│   ├── slider-add.php            # Add hero banner form
+│   ├── slider-edit.php           # Edit hero banner form
+│   ├── slider-delete.php         # Delete hero banner handler
+│   ├── executives.php            # Executive contacts & directors management
+│   ├── executive-add.php         # Add new executive / director form
+│   ├── executive-edit.php        # Edit executive / director form
+│   ├── executive-delete.php      # Delete executive handler
 │   ├── categories.php            # Category management
 │   ├── contacts.php              # Customer inquiries inbox & reader
 │   ├── settings.php              # Global website settings

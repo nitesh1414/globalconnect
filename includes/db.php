@@ -81,6 +81,40 @@ class Database {
                     $sql = file_get_contents($sqlFile);
                     $db->exec($sql);
                 }
+            } else {
+                // Ensure executives table exists if database was created earlier
+                $stmt = $db->query("SHOW TABLES LIKE 'executives'");
+                if (!$stmt->fetch()) {
+                    $db->exec("
+                        CREATE TABLE IF NOT EXISTS `executives` (
+                          `id` INT AUTO_INCREMENT PRIMARY KEY,
+                          `name` VARCHAR(150) NOT NULL,
+                          `role` VARCHAR(150) NOT NULL,
+                          `email` VARCHAR(150) NOT NULL,
+                          `phone` VARCHAR(50) DEFAULT '',
+                          `location` VARCHAR(150) DEFAULT '',
+                          `bio` TEXT NULL,
+                          `avatar` VARCHAR(255) DEFAULT '',
+                          `sort_order` INT DEFAULT 0,
+                          `status` ENUM('active', 'inactive') DEFAULT 'active',
+                          `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+                          `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+                    ");
+                    $executives = [
+                        [1, 'Mr Shammy Songra', 'Founder / Director', 'shammy@globalconnectsg.com', '(65) 89451100', 'Singapore / India', '', 1, 'active'],
+                        [2, 'Mr Cliff Poh', 'Director – Singapore', 'cliffpoh@globalconnectsg.com', '(65) 89451100', 'Singapore HQ', '', 2, 'active'],
+                        [3, 'Mr. Lima Hutama Halim', 'Director – Indonesia Business', 'limahalim@globalconnectsg.com', '', 'Jakarta, Indonesia', '', 3, 'active'],
+                        [4, 'Mr. Kapil Gulati', 'Director – International Business & Financial Advisory', 'kapil@globalconnectsg.com', '', 'Global Advisory Desk', '', 4, 'active'],
+                        [5, 'Mr Sandeep Pratap Sanap', 'Associate Director & Partner – India & International Business', 'sandeep@globalconnectsg.com', '(91) 99100 02299', 'India Corporate Office', '', 5, 'active'],
+                        [6, 'Mr. Siddharth Maheshwari', 'Director – Business Development', 'siddharth@globalconnectsg.com', '', 'Business Development Desk', '', 6, 'active'],
+                        [7, 'Mr. Amit Gupta', 'Director – Business Development', 'amit@globalconnectsg.com', '', 'Business Development Desk', '', 7, 'active']
+                    ];
+                    $eStmt = $db->prepare("INSERT INTO `executives` (`id`, `name`, `role`, `email`, `phone`, `location`, `avatar`, `sort_order`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    foreach ($executives as $ex) {
+                        $eStmt->execute($ex);
+                    }
+                }
             }
         } catch (Exception $e) {
             error_log("Schema ensure error: " . $e->getMessage());
@@ -145,6 +179,21 @@ class Database {
                 show_text_overlay INTEGER DEFAULT 0,
                 status TEXT DEFAULT 'active',
                 sort_order INTEGER DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS executives (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                role TEXT NOT NULL,
+                email TEXT NOT NULL,
+                phone TEXT DEFAULT '',
+                location TEXT DEFAULT '',
+                bio TEXT,
+                avatar TEXT DEFAULT '',
+                sort_order INTEGER DEFAULT 0,
+                status TEXT DEFAULT 'active',
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
@@ -231,6 +280,24 @@ class Database {
                 'active',
                 2
             ]);
+        }
+
+        // Seed Executives if empty
+        $execCount = $db->query("SELECT COUNT(*) FROM executives")->fetchColumn();
+        if ($execCount == 0) {
+            $execs = [
+                [1, 'Mr Shammy Songra', 'Founder / Director', 'shammy@globalconnectsg.com', '(65) 89451100', 'Singapore / India', '', 1, 'active'],
+                [2, 'Mr Cliff Poh', 'Director – Singapore', 'cliffpoh@globalconnectsg.com', '(65) 89451100', 'Singapore HQ', '', 2, 'active'],
+                [3, 'Mr. Lima Hutama Halim', 'Director – Indonesia Business', 'limahalim@globalconnectsg.com', '', 'Jakarta, Indonesia', '', 3, 'active'],
+                [4, 'Mr. Kapil Gulati', 'Director – International Business & Financial Advisory', 'kapil@globalconnectsg.com', '', 'Global Advisory Desk', '', 4, 'active'],
+                [5, 'Mr Sandeep Pratap Sanap', 'Associate Director & Partner – India & International Business', 'sandeep@globalconnectsg.com', '(91) 99100 02299', 'India Corporate Office', '', 5, 'active'],
+                [6, 'Mr. Siddharth Maheshwari', 'Director – Business Development', 'siddharth@globalconnectsg.com', '', 'Business Development Desk', '', 6, 'active'],
+                [7, 'Mr. Amit Gupta', 'Director – Business Development', 'amit@globalconnectsg.com', '', 'Business Development Desk', '', 7, 'active']
+            ];
+            $eStmt = $db->prepare("INSERT INTO executives (id, name, role, email, phone, location, avatar, sort_order, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            foreach ($execs as $ex) {
+                $eStmt->execute($ex);
+            }
         }
 
         // Seed default settings
