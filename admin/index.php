@@ -13,6 +13,7 @@ $financePagesCount = 0;
 $totalInquiries = 0;
 $unreadInquiries = 0;
 $totalSlides = 0;
+$totalExecs = 0;
 $recentInquiries = [];
 $recentPages = [];
 
@@ -23,6 +24,7 @@ try {
     $totalInquiries = $db->query("SELECT COUNT(*) FROM contacts")->fetchColumn();
     $unreadInquiries = $db->query("SELECT COUNT(*) FROM contacts WHERE status = 'unread'")->fetchColumn();
     $totalSlides = $db->query("SELECT COUNT(*) FROM hero_slides")->fetchColumn();
+    $totalExecs = $db->query("SELECT COUNT(*) FROM executives")->fetchColumn();
 
     $recentInquiries = $db->query("SELECT * FROM contacts ORDER BY created_at DESC LIMIT 5")->fetchAll();
     $recentPages = $db->query("
@@ -75,6 +77,14 @@ require_once __DIR__ . '/includes/header.php';
 
     <div class="kpi-card">
         <div class="kpi-info">
+            <h4>Leadership Team</h4>
+            <div class="number"><?= $totalExecs ?></div>
+        </div>
+        <div class="kpi-icon icon-gold">👥</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-info">
             <h4>Inquiries</h4>
             <div class="number"><?= $totalInquiries ?> <?= $unreadInquiries > 0 ? "<small style='font-size: 14px; color: var(--admin-danger);'>($unreadInquiries new)</small>" : "" ?></div>
         </div>
@@ -91,6 +101,9 @@ require_once __DIR__ . '/includes/header.php';
         <a href="<?= admin_url('sliders.php') ?>" class="btn-admin-primary" style="background: #0369a1;">
             <span>🏙</span> Manage Hero Banners
         </a>
+        <a href="<?= admin_url('executives.php') ?>" class="btn-admin-primary" style="background: #0f172a;">
+            <span>👥</span> Manage Executive Team
+        </a>
         <a href="<?= admin_url('settings.php') ?>" class="btn-admin-primary" style="background: #b45309;">
             <span>🌟</span> Upload Logo &amp; Settings
         </a>
@@ -98,6 +111,13 @@ require_once __DIR__ . '/includes/header.php';
             <span>+</span> Add Trading Page
         </a>
         <a href="<?= admin_url('page-add.php?category=finance') ?>" class="btn-admin-primary" style="background: #16a34a;">
+            <span>+</span> Add Finance Page
+        </a>
+        <a href="<?= admin_url('contacts.php') ?>" class="btn-admin-secondary">
+            <span>✉</span> View Inquiries
+        </a>
+    </div>
+</div>
             <span>+</span> Add Finance Page
         </a>
         <a href="<?= admin_url('contacts.php') ?>" class="btn-admin-primary" style="background: #d97706;">

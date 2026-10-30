@@ -423,3 +423,37 @@ function get_hero_slide_by_id(int $id): ?array {
     }
 }
 
+/**
+ * Get Executives & Directors
+ */
+function get_executives(bool $onlyActive = true): array {
+    try {
+        $db = get_db();
+        $sql = "SELECT * FROM executives";
+        if ($onlyActive) {
+            $sql .= " WHERE status = 'active'";
+        }
+        $sql .= " ORDER BY sort_order ASC, id ASC";
+        $stmt = $db->query($sql);
+        return $stmt->fetchAll() ?: [];
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Get Single Executive by ID
+ */
+function get_executive_by_id(int $id): ?array {
+    try {
+        $db = get_db();
+        $stmt = $db->prepare("SELECT * FROM executives WHERE id = ? LIMIT 1");
+        $stmt->execute([$id]);
+        $exec = $stmt->fetch();
+        return $exec ?: null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+
