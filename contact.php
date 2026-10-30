@@ -1,6 +1,7 @@
 <?php
 /**
  * Global Connect - Contact Us Page (100% Dynamic from Admin Settings)
+ * Pre-populated with authentic data from https://site.globalconnectsg.com/mysite/contact/
  */
 require_once __DIR__ . '/includes/functions.php';
 
@@ -42,15 +43,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Dynamic Contact Settings
-$addrSg = get_setting('address_sg', '101 Kitchener Road #03-43, Jalan Besar Plaza, Singapore (208511)');
-$addrIndia = get_setting('address_india', 'No. 211 Rajnigandha Block, Garden Apartment, 21 Vitthal Mallya Road (opp. UB City), Bangalore 560001, India');
-$addrBranches = get_setting('address_branches', 'New Delhi, Mumbai, Hyderabad, and Chennai (By Appointment - Hyatt Hotels)');
+$addrSg = get_setting('address_sg', '101 KITCHENER ROAD #03-43 JALAN BESAR PLAZA SINGAPORE (208511)');
+$addrIndia = get_setting('address_india', 'NO. 211 RAJNIGANDHA BLOCK, GARDEN APARTMENT, 21 VITTHAL MALLYA ROAD (opp. UB CITY) BANGLORE 560001 INDIA');
+$addrBranches = get_setting('address_branches', 'New Delhi, Mumbai, Hyderabad and Chennai (By Appointment ONLY – IN HYATT GROUP OF HOTELS)');
 $addrIndonesia = get_setting('address_indonesia', 'HOTEL GRAND HYATT PLAZA, JL. M.H. THAMRIN KAV. 28-30, GONDANGDIA, MENTENG, JAKARTA, 10350, INDONESIA');
 $addrHongkong = get_setting('address_hongkong', 'HOTEL HYATT REGENCY 18 HANOI ROAD TSIM SHA TSU KOWLOON HONGKONG');
 $phoneSg = get_setting('header_phone_sg', '(65) 89451100');
 $phoneRoam = get_setting('header_phone_roam', '(91) 99100 02299');
+$faxNumber = get_setting('fax_number', '(65) 98260001 / (91) 99100 02299');
 $emailPrimary = get_setting('contact_email_primary', 'admin@globalconnectsg.com');
 $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg.com');
+$emailTertiary = get_setting('contact_email_tertiary', 'tsnshammy@gmail.com');
+
+// Executive Leadership Team
+$executives = [
+    [
+        'name' => 'Mr Shammy Songra',
+        'role' => 'Founder / Director',
+        'email' => 'shammy@globalconnectsg.com',
+        'location' => 'Singapore / India'
+    ],
+    [
+        'name' => 'Mr Cliff Poh',
+        'role' => 'Director – Singapore',
+        'email' => 'cliffpoh@globalconnectsg.com',
+        'location' => 'Singapore HQ'
+    ],
+    [
+        'name' => 'Mr. Lima Hutama Halim',
+        'role' => 'Director – Indonesia Business',
+        'email' => 'limahalim@globalconnectsg.com',
+        'location' => 'Jakarta, Indonesia'
+    ],
+    [
+        'name' => 'Mr. Kapil Gulati',
+        'role' => 'Director – International Business & Financial Advisory',
+        'email' => 'kapil@globalconnectsg.com',
+        'location' => 'Global Advisory Desk'
+    ],
+    [
+        'name' => 'Mr Sandeep Pratap Sanap',
+        'role' => 'Associate Director & Partner – India & International Business',
+        'email' => 'sandeep@globalconnectsg.com',
+        'location' => 'India Corporate Office'
+    ],
+    [
+        'name' => 'Mr. Siddharth Maheshwari',
+        'role' => 'Director – Business Development',
+        'email' => 'siddharth@globalconnectsg.com',
+        'location' => 'Business Development Desk'
+    ],
+    [
+        'name' => 'Mr. Amit Gupta',
+        'role' => 'Director – Business Development',
+        'email' => 'amit@globalconnectsg.com',
+        'location' => 'Business Development Desk'
+    ]
+];
 ?>
 
 <!-- Page Banner -->
@@ -66,10 +115,11 @@ $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg
 
 <div class="page-content-wrapper">
     <div class="container">
-        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-bottom: 60px;" class="contact-grid">
+        <!-- Top Contact & Form Grid -->
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-bottom: 70px;" class="contact-grid">
             <!-- Left: Contact Form -->
             <div class="reveal-left">
-                <span class="section-subtitle">Send an Enquiry</span>
+                <span class="section-subtitle">Send Us a Message</span>
                 <h2 class="section-title" style="margin-bottom: 25px;">How Can We Assist Your Business?</h2>
 
                 <?php if ($successMessage): ?>
@@ -108,10 +158,14 @@ $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg
                         <div class="form-group">
                             <label class="form-label" for="subject">Area of Inquiry</label>
                             <select id="subject" name="subject" class="form-control">
-                                <option value="Trading Services" <?= ($_POST['subject'] ?? '') === 'Trading Services' ? 'selected' : '' ?>>Commodity Trading &amp; Sourcing</option>
-                                <option value="Trade Finance / LC" <?= ($_POST['subject'] ?? '') === 'Trade Finance / LC' ? 'selected' : '' ?>>Trade Finance / Letter of Credit (LC)</option>
-                                <option value="Project Financing" <?= ($_POST['subject'] ?? '') === 'Project Financing' ? 'selected' : '' ?>>Project Finance &amp; Capital Raising</option>
-                                <option value="Corporate Consulting" <?= ($_POST['subject'] ?? '') === 'Corporate Consulting' ? 'selected' : '' ?>>Corporate Consulting / M&amp;A</option>
+                                <option value="Gold Bullion & Precious Metals" <?= ($_POST['subject'] ?? '') === 'Gold Bullion & Precious Metals' ? 'selected' : '' ?>>Gold Bullion &amp; Precious Metals</option>
+                                <option value="Sugar & Soft Commodities" <?= ($_POST['subject'] ?? '') === 'Sugar & Soft Commodities' ? 'selected' : '' ?>>Sugar (ICUMSA 45) &amp; Soft Commodities</option>
+                                <option value="Agro Products & Rice" <?= ($_POST['subject'] ?? '') === 'Agro Products & Rice' ? 'selected' : '' ?>>Agro Products &amp; Grains</option>
+                                <option value="Minerals, Metals & Ores" <?= ($_POST['subject'] ?? '') === 'Minerals, Metals & Ores' ? 'selected' : '' ?>>Minerals, Metals &amp; Ores</option>
+                                <option value="Petroleum & Lubricants" <?= ($_POST['subject'] ?? '') === 'Petroleum & Lubricants' ? 'selected' : '' ?>>Petroleum &amp; Lubricants (Mazut/D2)</option>
+                                <option value="Trade Finance / LC / SBLC" <?= ($_POST['subject'] ?? '') === 'Trade Finance / LC / SBLC' ? 'selected' : '' ?>>Trade Finance (LC / SBLC / BG)</option>
+                                <option value="Banking Support & Wire Transfers" <?= ($_POST['subject'] ?? '') === 'Banking Support & Wire Transfers' ? 'selected' : '' ?>>Banking Support &amp; Wire Transfers</option>
+                                <option value="Corporate Consulting & M&A" <?= ($_POST['subject'] ?? '') === 'Corporate Consulting & M&A' ? 'selected' : '' ?>>Corporate Consulting &amp; M&amp;A</option>
                                 <option value="General Enquiry" <?= ($_POST['subject'] ?? '') === 'General Enquiry' ? 'selected' : '' ?>>General Enquiry</option>
                             </select>
                         </div>
@@ -132,44 +186,74 @@ $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg
             <div class="reveal-right">
                 <!-- Singapore HQ -->
                 <div class="contact-card hover-lift">
-                    <h4>🇸🇬 Singapore Global Headquarters</h4>
+                    <h4>🇸🇬 GLOBAL HEADQUARTER (Singapore)</h4>
                     <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px;">
                         <strong><?= e(get_setting('company_name', 'GLOBAL CONNECT')) ?></strong><br>
                         <?= nl2br(e($addrSg)) ?>
                     </p>
                     <p style="font-size: 14px; margin-bottom: 6px;">
-                        <strong>Office Direct:</strong> <a href="tel:<?= preg_replace('/[^0-9+]/', '', $phoneSg) ?>" style="color: var(--secondary-color); font-weight: 600;"><?= e($phoneSg) ?></a>
+                        <strong>Singapore Mob. No:</strong> <a href="tel:<?= preg_replace('/[^0-9+]/', '', $phoneSg) ?>" style="color: var(--secondary-color); font-weight: 600;"><?= e($phoneSg) ?></a>
+                    </p>
+                    <p style="font-size: 14px; margin-bottom: 6px;">
+                        <strong>Corporate Email:</strong> <a href="mailto:<?= e($emailPrimary) ?>" style="color: var(--secondary-color); font-weight: 600;"><?= e($emailPrimary) ?></a>
                     </p>
                     <p style="font-size: 14px;">
-                        <strong>Corporate Email:</strong> <a href="mailto:<?= e($emailPrimary) ?>" style="color: var(--secondary-color); font-weight: 600;"><?= e($emailPrimary) ?></a>
+                        <strong>Fax:</strong> <span style="color: var(--text-muted);"><?= e($faxNumber) ?></span>
                     </p>
                 </div>
 
                 <!-- India Corporate Office -->
                 <div class="contact-card hover-lift" style="margin-top: 20px;">
-                    <h4>🇮🇳 India Corporate Office</h4>
+                    <h4>🇮🇳 INDIA HEADQUATER (Bangalore)</h4>
                     <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 12px;">
                         <?= nl2br(e($addrIndia)) ?>
                     </p>
                     <p style="font-size: 14px; margin-bottom: 6px;">
-                        <strong>Global Roaming (24/7):</strong> <a href="tel:<?= preg_replace('/[^0-9+]/', '', $phoneRoam) ?>" style="color: var(--secondary-color); font-weight: 600;"><?= e($phoneRoam) ?></a>
+                        <strong>Global Roam. No (24/7):</strong> <a href="tel:<?= preg_replace('/[^0-9+]/', '', $phoneRoam) ?>" style="color: var(--secondary-color); font-weight: 600;"><?= e($phoneRoam) ?></a>
                     </p>
-                    <?php if (!empty($emailSecondary)): ?>
-                        <p style="font-size: 14px;">
-                            <strong>Executive Email:</strong> <a href="mailto:<?= e($emailSecondary) ?>" style="color: var(--secondary-color); font-weight: 600;"><?= e($emailSecondary) ?></a>
-                        </p>
-                    <?php endif; ?>
+                    <p style="font-size: 14px;">
+                        <strong>Executive Mail:</strong> <a href="mailto:<?= e($emailSecondary) ?>" style="color: var(--secondary-color); font-weight: 600;"><?= e($emailSecondary) ?></a>
+                    </p>
                 </div>
 
                 <!-- International Branch Desks -->
                 <div class="contact-card hover-lift" style="margin-top: 20px;">
-                    <h4>🌏 International Branch Network</h4>
-                    <p style="color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 8px;">
-                        <strong>Indonesia:</strong> <?= e($addrIndonesia) ?><br>
+                    <h4>🌏 INDONESIA, HONG KONG &amp; BRANCHES</h4>
+                    <p style="color: var(--text-muted); font-size: 13.5px; line-height: 1.6; margin-bottom: 8px;">
+                        <strong>Indonesia (Jakarta):</strong> <?= e($addrIndonesia) ?><br>
                         <strong>Hong Kong:</strong> <?= e($addrHongkong) ?><br>
                         <strong>India Branches:</strong> <?= e($addrBranches) ?>
                     </p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Executive Leadership Directory -->
+        <div class="reveal-up" style="margin-top: 50px;">
+            <div class="section-header" style="text-align: center; margin-bottom: 40px;">
+                <span class="section-subtitle">Leadership Team</span>
+                <h2 class="section-title">Key Executive Contacts &amp; Directors</h2>
+                <p class="section-lead">
+                    Connect directly with our board of directors and regional business development leaders.
+                </p>
+            </div>
+
+            <div class="executive-grid">
+                <?php foreach ($executives as $idx => $exec): ?>
+                    <div class="executive-card hover-lift reveal-up" style="transition-delay: <?= ($idx * 0.08) ?>s;">
+                        <div class="exec-avatar">
+                            <?= strtoupper(substr($exec['name'], 3, 1)) ?>
+                        </div>
+                        <div class="exec-info">
+                            <h4 class="exec-name"><?= e($exec['name']) ?></h4>
+                            <p class="exec-role"><?= e($exec['role']) ?></p>
+                            <span class="exec-loc">📍 <?= e($exec['location']) ?></span>
+                            <a href="mailto:<?= e($exec['email']) ?>" class="exec-email">
+                                <span>✉</span> <?= e($exec['email']) ?>
+                            </a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
@@ -186,10 +270,11 @@ $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg
 }
 .contact-card h4 {
     color: var(--primary-color);
-    font-size: 16px;
+    font-size: 15px;
     margin-bottom: 10px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1.5px solid var(--border-color);
     padding-bottom: 6px;
+    font-weight: 700;
 }
 .form-group {
     margin-bottom: 20px;
@@ -248,6 +333,72 @@ $emailSecondary = get_setting('contact_email_secondary', 'shammy@globalconnectsg
 .page-content-wrapper {
     padding: 70px 0;
 }
+
+/* Executive Cards Grid */
+.executive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+.executive-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    box-shadow: var(--shadow-sm);
+}
+.exec-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bg-navy-gradient);
+    color: var(--accent-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--accent-gold);
+}
+.exec-info {
+    flex-grow: 1;
+}
+.exec-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+.exec-role {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+.exec-loc {
+    display: block;
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+.exec-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--secondary-color);
+    word-break: break-all;
+}
+.exec-email:hover {
+    color: var(--secondary-hover);
+    text-decoration: underline;
+}
+
 @media (max-width: 900px) {
     .contact-grid {
         grid-template-columns: 1fr !important;
