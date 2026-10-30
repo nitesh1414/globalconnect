@@ -248,7 +248,7 @@ img {
    SITE HEADER & NAVIGATION
    ========================================================= */
 .site-header {
-  background: linear-gradient(90deg, #dadd0d, #faec6b);
+  background: #ffffff;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
   position: sticky;
   top: 0;
@@ -257,7 +257,7 @@ img {
 }
 
 .site-header.scrolled {
-  background: linear-gradient(90deg, #f3f72c, #faec6b);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -266,7 +266,7 @@ img {
 .header-container {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 5px 5px;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -352,7 +352,7 @@ img {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px;
+  padding: 10px 14px;
   color: var(--primary-color);
   font-weight: 600;
   font-size: 14px;
